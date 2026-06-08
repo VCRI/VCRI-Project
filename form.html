@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enter Details &amp; Parameters | Dairy Project Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gd:#14532d;--gm:#1B5E20;--gl:#2E7D32;--gp:#E8F5E9;--gold:#F9A825;--ink:#10241a;--muted:#5b6f63;--line:#cfe3d2;--cream:#f6faf4}
+/* ════ APP SHELL: page does not scroll; only main content scrolls ════ */
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;color:var(--ink);background:var(--cream);line-height:1.5;
+  height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+
+/* 1) FIXED HEADER */
+.app-header{flex:none;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 26px;background:var(--gd);color:#fff}
+.bar .brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:#fff;min-width:0}
+.bar .seal{width:36px;height:36px;border-radius:50%;background:linear-gradient(140deg,var(--gm),var(--gl));display:grid;place-items:center;font-weight:800;font-size:12px;border:2px solid var(--gold);flex:none}
+.bar b{font-size:14px;font-weight:800}
+.bar .brand span{display:block;font-size:11px;color:rgba(255,255,255,.7)}
+/* Back / Next on the right of the header, with clear space between them */
+.bar-actions{display:flex;align-items:center;gap:14px;flex:none}
+.bar-actions .btn{padding:9px 20px;font-size:14px}
+.bar-actions .btn-ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.4)}
+.bar-actions .btn-ghost:hover{background:rgba(255,255,255,.24)}
+.bar-actions .btn[disabled]{opacity:.45}
+.progress-track{height:4px;background:rgba(255,255,255,.15)}
+.progress-fill{height:100%;width:0;background:var(--gold);transition:width .3s}
+
+/* 2) MIDDLE ROW (fills remaining height; itself does not scroll) */
+.app-body{flex:1 1 auto;min-height:0;display:flex;overflow:hidden}
+
+/* 3) FIXED LEFT SIDEBAR (own scroll if list is long) */
+.app-sidebar{flex:none;width:230px;background:#fff;border-right:1px solid var(--line);
+  overflow-y:auto;padding:18px 14px}
+.app-sidebar h4{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:2px 0 10px 4px;font-weight:800}
+.app-sidebar ul{list-style:none}
+.app-sidebar li a{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:9px;
+  border-left:4px solid transparent;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;
+  text-decoration:none;transition:background .2s ease,color .2s ease,border-color .2s ease,font-weight .2s ease}
+.app-sidebar li a .n{width:22px;height:22px;border-radius:50%;background:var(--gp);color:var(--gm);display:grid;place-items:center;font-size:11px;font-weight:800;flex:none;transition:.2s}
+.app-sidebar li a:hover{background:var(--cream);color:var(--gd)}
+.app-sidebar li a.active{background:var(--gp);color:var(--gd);border-left-color:var(--gold);font-weight:800}
+.app-sidebar li a.active .n{background:var(--gold);color:#3a2c00}
+.app-sidebar li a.done .n{background:var(--gm);color:#fff;font-size:0}
+.app-sidebar li a.done .n::after{content:"✓";font-size:11px}
+
+/* 4) SCROLLABLE MAIN CONTENT (the only scrollbar) */
+.app-main{flex:1 1 auto;min-width:0;overflow-y:auto;overflow-x:hidden}
+.main-inner{max-width:760px;margin:0 auto;padding:26px 28px 32px}
+
+/* inline validation message (only shows on error) */
+.secmsg{font-size:13px;font-weight:600;color:#c62828;background:#fff5f5;border:1px solid #f3c2c2;border-radius:9px;padding:10px 14px;margin-bottom:16px}
+.secmsg:empty{display:none}
+
+/* intro */
+.intro{margin-bottom:22px}
+.intro .kick{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--gl)}
+.intro h1{font-family:'Playfair Display',serif;font-size:30px;color:var(--gd);margin:4px 0 6px}
+.intro p{font-size:14.5px;color:var(--muted)}
+
+/* section card — wizard: one visible at a time (clearly highlighted) */
+.sec{background:#fff;border:1.5px solid #bcd8c1;border-top:4px solid var(--gm);border-radius:16px;padding:26px 28px;margin-bottom:22px;box-shadow:0 12px 34px rgba(20,83,45,.14);display:none;animation:fadein .25s ease}
+.sec.active{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sec-h{display:flex;align-items:center;gap:13px;margin-bottom:4px}
+.sec-h .ic{width:40px;height:40px;border-radius:11px;background:var(--gp);color:var(--gm);display:grid;place-items:center;flex:none}
+.sec-h h2{font-size:18px;font-weight:800;color:var(--gd)}
+.sec-h .step-tag{margin-left:auto;font-size:11px;font-weight:700;color:var(--muted);background:var(--cream);padding:4px 10px;border-radius:20px;border:1px solid var(--line)}
+.sec-note{font-size:13px;color:var(--muted);margin:0 0 18px 53px}
+@media(max-width:680px){.sec-note{margin-left:0}}
+
+/* grid of fields */
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:15px 18px}
+.f{display:flex;flex-direction:column;gap:6px}
+.f.full{grid-column:1/-1}
+.f label{font-size:13px;font-weight:600;color:var(--ink)}
+.f label .req{color:#c62828;margin-left:2px}
+.f label .opt{color:var(--muted);font-weight:500;font-size:11.5px}
+.f .hint{font-size:11.5px;color:var(--muted)}
+.inp{position:relative;display:flex;align-items:center}
+.inp input,.inp select,textarea.ta{width:100%;font-family:inherit;font-size:14px;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:9px;padding:10px 12px;transition:border .15s,box-shadow .15s}
+.inp input:focus,.inp select:focus,textarea.ta:focus{outline:none;border-color:var(--gl);box-shadow:0 0 0 3px rgba(46,125,50,.12)}
+.inp .unit{position:absolute;right:11px;font-size:12px;color:var(--muted);font-weight:600;pointer-events:none;background:#fff;padding-left:6px}
+.inp.has-unit input{padding-right:46px}
+.unit-row{display:flex;align-items:center;gap:8px;margin-top:2px}
+.unit-row span{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:.3px}
+.unit-below{width:auto;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+.unit-below:focus{outline:none;border-color:var(--gl);box-shadow:0 0 0 3px rgba(46,125,50,.12)}
+textarea.ta{resize:vertical;min-height:62px}
+.inp input.err,.inp select.err,textarea.ta.err{border-color:#c62828;box-shadow:0 0 0 3px rgba(198,40,40,.1)}
+
+/* subhead inside section */
+.subhead{grid-column:1/-1;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--gl);margin-top:6px;padding-top:12px;border-top:1px dashed var(--line)}
+.subhead:first-child{border-top:none;padding-top:0;margin-top:0}
+
+/* total chip */
+.totchip{grid-column:1/-1;display:flex;align-items:center;gap:10px;background:var(--gp);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:13.5px;color:var(--gd);font-weight:600}
+.totchip b{font-size:16px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:15px;padding:13px 26px;border-radius:11px;cursor:pointer;border:none;font-family:inherit;transition:.15s}
+.btn-primary{background:var(--gold);color:#3a2c00;box-shadow:0 8px 22px rgba(249,168,37,.32)}
+.btn-primary:hover{background:#ffba2e;transform:translateY(-1px)}
+.btn-ghost{background:#fff;color:var(--gd);border:1.5px solid var(--line)}
+.btn-ghost:hover{background:var(--cream);border-color:var(--gl)}
+.btn[disabled]{opacity:.4;cursor:not-allowed;pointer-events:none}
+
+@media(max-width:760px){
+  .app-body{flex-direction:column}
+  .app-sidebar{width:auto;border-right:none;border-bottom:1px solid var(--line);padding:8px 10px;overflow-x:auto;overflow-y:hidden}
+  .app-sidebar h4{display:none}
+  .app-sidebar ul{display:flex;gap:6px}
+  .app-sidebar li a{border-left:none;border-bottom:3px solid transparent;white-space:nowrap;padding:8px 12px}
+  .app-sidebar li a.active{border-left:none;border-bottom-color:var(--gold)}
+  .fields{grid-template-columns:1fr}
+  .main-inner{padding:20px 16px}
+  .sec{padding:20px 16px}
+  .intro h1{font-size:24px}
+}
+/* compact header so brand + Back/Next never overflow on phones */
+@media(max-width:560px){
+  .bar{padding:9px 14px;gap:8px}
+  .bar .brand span{display:none}
+  .bar b{font-size:12.5px}
+  .bar .seal{width:32px;height:32px}
+  .bar-actions{gap:8px}
+  .bar-actions .btn{padding:9px 14px;font-size:13px}
+  .sec-h h2{font-size:16px}
+  .sec-h .step-tag{display:none}
+}
+@media(max-width:380px){
+  .bar-actions .btn svg{display:none}
+  .bar-actions .btn{padding:9px 12px}
+}
+</style>
+</head>
+<body>
+
+<!-- ░░ FIXED HEADER (brand left · Back/Next right) ░░ -->
+<header class="app-header">
+  <div class="bar">
+    <a class="brand" href="index.html">
+      <div class="seal">VC<span style="font-size:7px">RI</span></div>
+      <div><b>Dairy Project Report</b><span>VC&amp;RI, Namakkal · Dept. of AH Economics</span></div>
+    </a>
+    <div class="bar-actions">
+      <button class="btn btn-ghost" id="backbtn" type="button" disabled>
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back
+      </button>
+      <button class="btn btn-primary" id="nextbtn" type="button">
+        Next
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="pfill"></div></div>
+</header>
+
+<!-- ░░ MIDDLE ROW: fixed sidebar + scrollable main (no footer) ░░ -->
+<div class="app-body">
+  <aside class="app-sidebar">
+    <h4>Sections</h4>
+    <ul id="sidenav"></ul>
+  </aside>
+
+  <main class="app-main" id="appMain">
+    <div class="main-inner">
+      <div class="intro">
+        <div class="kick">Step 1 of 2 · Your Details</div>
+        <h1>Enter your details to generate the report</h1>
+        <p>Fill in each section below. Default values follow the VC&amp;RI model — change any figure to match your own farm, then click <b>Generate Report</b>.</p>
+      </div>
+      <div class="secmsg" id="footmsg"></div>
+      <form id="dform"></form>
+    </div>
+  </main>
+</div>
+
+<script>
+// ───────────────────────── FORM SCHEMA ─────────────────────────
+// Detail keys = friendly names; parameter keys = Techno-Economic cell ids (faithful to Excel).
+const ICONS = {
+  details:'<path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 7a4 4 0 108 0 4 4 0 00-8 0z"/>',
+  animal:'<path d="M3 5l4 2 2-3 3 3 3-3 2 3 4-2-2 8H5zM6 17h12v3H6z"/>',
+  shed:'<path d="M3 11l9-7 9 7M5 10v10h14V10"/>',
+  equip:'<path d="M12 8a4 4 0 100 8 4 4 0 000-8zM2 12h2m16 0h2M12 2v2m0 16v2"/>',
+  infra:'<path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/>',
+  finance:'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>',
+  vehicle:'<path d="M3 13l2-5h11l3 5M5 13h15v4H5zM7 17a2 2 0 11-4 0M21 17a2 2 0 11-4 0"/>',
+  expense:'<path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/>',
+  labour:'<path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2M11 7a4 4 0 108 0 4 4 0 00-8 0zM3 7a4 4 0 006 3.5"/>',
+  returns:'<path d="M3 17l6-6 4 4 8-8M14 7h7v7"/>'
+};
+
+const SECTIONS = [
+  { id:'details', title:'Your Details', icon:'details',
+    note:'Items 1–9 of the “Project at a Glance” — used on the report cover.',
+    fields:[
+      {k:'farmerName', label:'Name of the Farmer / Unit', type:'text', req:true, full:true, val:'name', ph:'e.g. Ramesh Kumar Dairy Farm'},
+      {k:'farmerAddress', label:'Address of the Farmer', type:'textarea', req:true, full:true, val:'address', ph:'Door no., street, village, district, PIN'},
+      {k:'aadhar', label:'Aadhar Number', opt:true, type:'text', val:'aadhar', ph:'12-digit Aadhar'},
+      {k:'mobile', label:'Mobile Number', type:'tel', req:true, val:'mobile', ph:'10-digit mobile'},
+      {k:'email', label:'E-mail Id', opt:true, type:'email', val:'email', ph:'name@example.com'},
+      {k:'natureFarming', label:'Nature of the Farming / Activity', type:'text', def:'Dairy Farming', val:'words'},
+      {k:'farmLocation', label:'Address / Location of the Farm', type:'textarea', req:true, full:true, val:'address', ph:'Survey no., village, taluk, district, PIN'},
+      {k:'bankName', label:'Name of the Financing Bank', type:'text', req:true, val:'words', ph:'e.g. Canara Bank'},
+      {k:'branchName', label:'Name of the Branch', type:'text', req:true, val:'words', ph:'e.g. Namakkal Main Branch'},
+    ]},
+
+  { id:'animal', title:'Animal', icon:'animal',
+    note:'Type, breed and herd size. The unit is run as two staggered batches.',
+    fields:[
+      {k:'C7', label:'Type of Milch Animal', type:'select', def:'Cow', opts:['Cow','Buffalo']},
+      {k:'C8', label:'Name of the Breed', type:'select', def:'Jersey Cross', opts:['Jersey Cross','HF Cross','Indigenous']},
+      {k:'D9', label:'Unit Size — Batch 1', type:'num', def:5, unit:'nos', min:0, hint:'Animals in first batch'},
+      {k:'F9', label:'Unit Size — Batch 2', type:'num', def:5, unit:'nos', min:0, hint:'Animals in second (staggered) batch'},
+      {k:'__total', type:'total', label:'Total Unit Size'},
+      {k:'C10', label:'Purchase Cost of Animals', type:'num', def:80000, unit:'₹/animal', min:0},
+      {k:'C11', label:'Average Milk Yield', type:'num', def:12, unit:'L/day', min:0, step:0.1},
+      {k:'C12', label:'Insurance Premium', type:'num', def:6, unit:'% /yr', min:0, step:0.1},
+      {k:'C13', label:'Transport Charges', type:'num', def:1000, unit:'₹/animal', min:0},
+    ]},
+
+  { id:'shed', title:'Shed / Building', icon:'shed',
+    note:'Floor space and construction rates for sheds and the store room.',
+    fields:[
+      {k:'C16', label:'Floor Space — Milch Animal', type:'num', def:60, unit:'sq.ft', min:0, hint:'55–70 sq.ft per cow'},
+      {k:'C17', label:'Construction Cost — Animal Shed', type:'num', def:450, unit:'₹/sq.ft', min:0},
+      {k:'C18', label:'Floor Space — Calves', type:'num', def:30, unit:'sq.ft', min:0, hint:'15–20 sq.ft per calf'},
+      {k:'C19', label:'Construction Cost — Calves Shed', type:'num', def:250, unit:'₹/sq.ft', min:0},
+      {k:'C20', label:'Floor Space — Store Room', type:'num', def:600, unit:'sq.ft', min:0},
+      {k:'C21', label:'Construction Cost — Store Room', type:'num', def:450, unit:'₹/sq.ft', min:0},
+    ]},
+
+  { id:'equip', title:'Equipment', icon:'equip',
+    note:'Dairy equipment and machinery. Leave optional items at 0 if not required.',
+    fields:[
+      {k:'C24', label:'Feeder &amp; Waterer', type:'num', def:200, unit:'₹/animal', min:0},
+      {k:'C25', label:'Milking Can', type:'num', def:3000, unit:'₹', min:0},
+      {k:'C26', label:'Milking Machine', type:'num', def:60000, unit:'₹', min:0},
+      {k:'C27', label:'Chaff Cutter', type:'num', def:30000, unit:'₹', min:0},
+      {k:'C28', label:'Brush Cutter', type:'num', def:10000, unit:'₹', min:0},
+      {k:'C29', label:'Feed Making Machinery', type:'num', def:0, unit:'₹', min:0},
+      {k:'C30', label:'Milk Processing Machinery', type:'num', def:0, unit:'₹', min:0},
+      {k:'C31', label:'Motor for Irrigation', type:'num', def:0, unit:'₹', min:0},
+      {k:'C32', label:'Sprinkler &amp; Fogger', type:'num', def:0, unit:'₹', min:0},
+      {k:'C33', label:'Computers', type:'num', def:0, unit:'₹', min:0},
+      {k:'C34', label:'CCTV', type:'num', def:0, unit:'₹', min:0},
+    ]},
+
+  { id:'infra', title:'Other Infrastructure', icon:'infra',
+    note:'Optional additional units — all default to 0. Fill only what applies.',
+    fields:[
+      {k:'C37', label:'Floor Space — Labour Quarters', type:'num', def:0, unit:'sq.ft', min:0},
+      {k:'C38', label:'Construction Cost — Labour Quarters', type:'num', def:0, unit:'₹/sq.ft', min:0},
+      {k:'C39', label:'Overhead Tank', type:'num', def:0, unit:'₹', min:0},
+      {k:'C40', label:'Fencing', type:'num', def:0, unit:'₹', min:0},
+      {k:'C41', label:'Land Levelling Charges', type:'num', def:0, unit:'₹', min:0},
+      {k:'C42', label:'Digging of Borewell', type:'num', def:0, unit:'₹', min:0},
+      {k:'C43', label:'Floor Space — Feed Mill', type:'num', def:0, unit:'sq.ft', min:0},
+      {k:'C44', label:'Construction Cost — Feed Mill', type:'num', def:0, unit:'₹/sq.ft', min:0},
+      {k:'C45', label:'Floor Space — Milk Processing Unit', type:'num', def:0, unit:'sq.ft', min:0},
+      {k:'C46', label:'Construction Cost — Milk Processing Unit', type:'num', def:0, unit:'₹/sq.ft', min:0},
+      {k:'C47', label:'Bio Gas Unit', type:'num', def:0, unit:'₹', min:0},
+      {k:'C48', label:'Vermicompost Unit', type:'num', def:0, unit:'₹', min:0},
+      {k:'C49', label:'Silage Making Unit', type:'num', def:0, unit:'₹', min:0},
+    ]},
+
+  { id:'finance', title:'Means of Finance', icon:'finance',
+    note:'Loan terms and subsidy. These drive the repayment schedule and ratios.',
+    fields:[
+      {k:'C52', label:'Margin Money', type:'num', def:5, unit:'%', min:0, step:0.1, hint:'Promoter contribution'},
+      {k:'C53', label:'Rate of Interest', type:'num', def:11.5, unit:'% /yr', min:0, step:0.1},
+      {k:'C54', label:'Repayment Period', type:'num', def:7, unit:'years', min:1, max:15},
+      {k:'C55', label:'Subsidy', type:'num', def:35, unit:'%', min:0, step:0.1, hint:'Of total project cost'},
+    ]},
+
+  { id:'vehicle', title:'Vehicle', icon:'vehicle',
+    note:'Optional transport. Leave at 0 if no vehicle is part of the project.',
+    fields:[
+      {k:'C58', label:'Number of Two-Wheelers', type:'num', def:0, unit:'nos', min:0},
+      {k:'C59', label:'Cost per Two-Wheeler', type:'num', def:0, unit:'₹', min:0},
+      {k:'C60', label:'Number of Four-Wheelers', type:'num', def:0, unit:'nos', min:0},
+      {k:'C61', label:'Cost per Four-Wheeler', type:'num', def:0, unit:'₹', min:0},
+    ]},
+
+  { id:'expense', title:'Expenses', icon:'expense',
+    note:'Feeding, fodder, vet, utilities and depreciation rates.',
+    fields:[
+      {k:'__s1', type:'sub', label:'Feeding'},
+      {k:'C64', label:'Total Milking Period', type:'num', def:300, unit:'days/yr', min:0},
+      {k:'C65', label:'Total Dry Period', type:'num', def:65, unit:'days/yr', min:0},
+      {k:'C66', label:'Concentrate — Milking Period', type:'num', def:4, unit:'kg/day', min:0, step:0.1},
+      {k:'C67', label:'Concentrate — Dry Period', type:'num', def:2, unit:'kg/day', min:0, step:0.1},
+      {k:'C68', label:'Cost of Concentrate Feed', type:'num', def:24, unit:'₹/kg', min:0},
+      {k:'C69', label:'Dry Fodder Requirement', type:'num', def:4, unit:'kg/day', min:0, step:0.1},
+      {k:'C70', label:'Cost of Dry Fodder', type:'num', def:3, unit:'₹/kg', min:0},
+      {k:'C71', label:'Green Fodder Area', type:'num', def:2, unit:'acres', min:0, step:0.1},
+      {k:'C72', label:'Green Fodder — Establish (Yr 1)', type:'num', def:5000, unit:'₹/acre', min:0},
+      {k:'C73', label:'Green Fodder — Yr 2 onward', type:'num', def:3000, unit:'₹/acre', min:0},
+      {k:'__s2', type:'sub', label:'Health &amp; Utilities'},
+      {k:'C74', label:'Veterinary Aid', type:'num', def:500, unit:'₹/animal/yr', min:0},
+      {k:'C75', label:'Electricity Charges', type:'num', def:500, unit:'₹/month', min:0},
+      {k:'C76', label:'Fuel Charges', type:'num', def:0, unit:'₹/month', min:0},
+      {k:'C79', label:'Miscellaneous Expenses', type:'num', def:100, unit:'₹/animal/yr', min:0},
+      {k:'__s3', type:'sub', label:'Depreciation Rates'},
+      {k:'C77', label:'Depreciation — Buildings', type:'num', def:10, unit:'% /yr', min:0, step:0.1},
+      {k:'C78', label:'Depreciation — Equipment', type:'num', def:15, unit:'% /yr', min:0, step:0.1},
+      {k:'__s4', type:'sub', label:'Add-on Unit Running Costs (optional)'},
+      {k:'C80', label:'Feed Making Unit', type:'num', def:0, unit:'₹/yr', min:0},
+      {k:'C81', label:'Milk Processing Unit', type:'num', def:0, unit:'₹/yr', min:0},
+      {k:'C82', label:'Vermicompost Unit', type:'num', def:0, unit:'₹/yr', min:0},
+      {k:'C83', label:'Silage Making Unit', type:'num', def:0, unit:'₹/yr', min:0},
+    ]},
+
+  { id:'labour', title:'Labour', icon:'labour',
+    note:'Number and monthly wages of each type of worker.',
+    fields:[
+      {k:'C86', label:'No. of Farm Workers', type:'num', def:1, unit:'nos', min:0},
+      {k:'C87', label:'Wages — Farm Worker', type:'num', def:10000, unit:'₹/month', min:0},
+      {k:'C88', label:'No. of Farm Managers', type:'num', def:0, unit:'nos', min:0},
+      {k:'C89', label:'Salary — Farm Manager', type:'num', def:0, unit:'₹/month', min:0},
+      {k:'C90', label:'No. of Drivers', type:'num', def:0, unit:'nos', min:0},
+      {k:'C91', label:'Salary — Driver', type:'num', def:0, unit:'₹/month', min:0},
+      {k:'C92', label:'No. of Office Staff', type:'num', def:0, unit:'nos', min:0},
+      {k:'C93', label:'Salary — Office Staff', type:'num', def:0, unit:'₹/month', min:0},
+    ]},
+
+  { id:'returns', title:'Returns', icon:'returns',
+    note:'Sale prices that drive the income side of the report.',
+    fields:[
+      {k:'C96', label:'Sale Price of Milk', type:'num', def:37, unit:'₹/litre', min:0, step:0.1},
+      {k:'C97', label:'Sale Price of Male Calves', type:'num', def:2000, unit:'₹/calf', min:0},
+      {k:'C98', label:'Value of Female Calves', type:'num', def:5000, unit:'₹/calf', min:0},
+      {k:'C99', label:'Sale Price of Manure', type:'num', def:500, unit:'₹/animal/yr', min:0},
+      {k:'C100', label:'Income from Feed Making Unit', type:'num', def:0, unit:'₹/yr', min:0},
+      {k:'C101', label:'Income from Milk Processing Unit', type:'num', def:0, unit:'₹/yr', min:0},
+    ]},
+];
+
+// ───────────────────────── RENDER ─────────────────────────
+const form = document.getElementById('dform');
+const sidenav = document.getElementById('sidenav');
+
+function fieldHTML(f){
+  if(f.type==='sub')  return `<div class="subhead">${f.label}</div>`;
+  if(f.type==='total')return `<div class="totchip" id="totchip">Total Unit Size:&nbsp; <b id="totval">0</b> &nbsp;animals</div>`;
+  const id='fld_'+f.k;
+  const reqMark = f.req?'<span class="req">*</span>':(f.opt?' <span class="opt">(optional)</span>':'');
+  const hint = f.hint?`<span class="hint">${f.hint}</span>`:'';
+  let control='';
+  if(f.type==='textarea'){
+    control=`<textarea class="ta" id="${id}" name="${f.k}" placeholder="${f.ph||''}"></textarea>`;
+  } else if(f.type==='select'){
+    control=`<div class="inp"><select id="${id}" name="${f.k}">${f.opts.map(o=>`<option ${o===f.def?'selected':''}>${o}</option>`).join('')}</select></div>`;
+  } else if(f.type==='datalist'){
+    control=`<div class="inp"><input id="${id}" name="${f.k}" list="dl_${f.k}" value="${f.def||''}" placeholder="${f.ph||''}"><datalist id="dl_${f.k}">${f.opts.map(o=>`<option value="${o}">`).join('')}</datalist></div>`;
+  } else if(f.type==='num'){
+    if(f.unitOpts){
+      const sel=`<div class="unit-row"><span>Unit</span><select class="unit-below" id="unit_${f.k}">${f.unitOpts.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`;
+      control=`<div class="inp"><input type="number" id="${id}" name="${f.k}" value="${f.def}" min="${f.min??''}" step="${f.step||'1'}" inputmode="decimal"></div>${sel}`;
+    } else {
+      const u=f.unit?`<span class="unit">${f.unit}</span>`:'';
+      control=`<div class="inp ${f.unit?'has-unit':''}"><input type="number" id="${id}" name="${f.k}" value="${f.def}" min="${f.min??''}" ${f.max!=null?`max="${f.max}"`:''} step="${f.step||'1'}" inputmode="decimal">${u}</div>`;
+    }
+  } else { // text / tel / email
+    control=`<div class="inp"><input type="${f.type}" id="${id}" name="${f.k}" value="${f.def||''}" placeholder="${f.ph||''}"></div>`;
+  }
+  return `<div class="f ${f.full?'full':''}">
+      <label for="${id}">${f.label}${reqMark}</label>
+      ${control}${hint}
+    </div>`;
+}
+
+SECTIONS.forEach((s,i)=>{
+  // side nav
+  sidenav.insertAdjacentHTML('beforeend',
+    `<li><a href="#sec-${s.id}" data-sec="${s.id}"><span class="n">${i+1}</span>${s.title}</a></li>`);
+  // section card
+  form.insertAdjacentHTML('beforeend',`
+    <section class="sec" id="sec-${s.id}">
+      <div class="sec-h">
+        <div class="ic"><svg width="21" height="21" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">${ICONS[s.icon]}</svg></div>
+        <h2>${s.title}</h2>
+        <span class="step-tag">Section ${i+1} / ${SECTIONS.length}</span>
+      </div>
+      <p class="sec-note">${s.note}</p>
+      <div class="fields">${s.fields.map(fieldHTML).join('')}</div>
+    </section>`);
+});
+
+// ───────────────────────── LIVE TOTAL (unit size) ─────────────────────────
+const d9=document.getElementById('fld_D9'), f9=document.getElementById('fld_F9'), totval=document.getElementById('totval');
+function updTotal(){ const t=(+d9.value||0)+(+f9.value||0); totval.textContent=t; }
+[d9,f9].forEach(el=>el.addEventListener('input',updTotal)); updTotal();
+
+// ───────────────────────── WIZARD NAVIGATION ─────────────────────────
+const links=[...document.querySelectorAll('.app-sidebar a')];
+const appMain=document.getElementById('appMain');
+const secs=[...document.querySelectorAll('.sec')];
+const pfill=document.getElementById('pfill');
+const footmsg=document.getElementById('footmsg');
+const backbtn=document.getElementById('backbtn');
+const nextbtn=document.getElementById('nextbtn');
+const introKick=document.querySelector('.intro .kick');
+const N=SECTIONS.length;
+let cur=0;
+const ARROW='<svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
+const clearErrors=scope=>(scope||document).querySelectorAll('.err').forEach(e=>e.classList.remove('err'));
+
+// ── field validators — reject random/invalid input ──
+const VALIDATORS = {
+  mobile : {clean:v=>v.replace(/\D/g,''), re:/^[6-9]\d{9}$/,            msg:'Enter a valid 10-digit mobile number (starting 6–9).'},
+  email  : {re:/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/,                        msg:'Enter a valid e-mail address (e.g. name@example.com).'},
+  aadhar : {clean:v=>v.replace(/\D/g,''), re:/^\d{12}$/,                msg:'Aadhar must be exactly 12 digits.'},
+  name   : {re:/[A-Za-z]/, minLen:2, bad:/^[\s\d.,&'\/-]+$/,            msg:'Enter a valid name (use letters, not just numbers/symbols).'},
+  words  : {re:/[A-Za-z]/, minLen:2,                                    msg:'Enter a valid name (use letters).'},
+  address: {re:/[A-Za-z]/, minLen:6,                                    msg:'Enter a complete address (letters, at least a few words).'}
+};
+
+function validateSection(i){
+  clearErrors(secs[i]);
+  let firstBad=null, msg='';
+  for(const f of SECTIONS[i].fields){
+    if(f.type==='sub'||f.type==='total') continue;
+    const el=document.getElementById('fld_'+f.k);
+    const val = (el.value||'').trim();
+    // required check
+    if(f.req && val===''){ el.classList.add('err'); if(!firstBad){firstBad=el; msg='Please fill the highlighted required field(s).';} continue; }
+    // format check (only when something is entered)
+    if(val && f.val && VALIDATORS[f.val]){
+      const V=VALIDATORS[f.val];
+      const test = V.clean ? V.clean(val) : val;
+      const ok = (!V.re || V.re.test(test)) && (!V.minLen || test.length>=V.minLen) && (!V.bad || !V.bad.test(val));
+      if(!ok){ el.classList.add('err'); if(!firstBad){firstBad=el; msg=V.msg;} }
+    }
+  }
+  // 0 animals is allowed (gives an all-zero, income-free project) — only block negatives
+  if(SECTIONS[i].id==='animal' && ((+d9.value||0)<0 || (+f9.value||0)<0)){
+    d9.classList.add('err'); f9.classList.add('err'); if(!firstBad){firstBad=d9; msg='Unit size cannot be negative.';}
+  }
+  if(firstBad){
+    footmsg.className='secmsg';
+    footmsg.textContent = msg || 'Please correct the highlighted field(s).';
+    if(i===cur){ firstBad.scrollIntoView({behavior:'smooth',block:'center'}); firstBad.focus({preventScroll:true}); }
+    return false;
+  }
+  return true;
+}
+
+function show(i){
+  cur=i;
+  secs.forEach((s,k)=>s.classList.toggle('active',k===i));
+  links.forEach((a,k)=>{ a.classList.toggle('active',k===i); a.classList.toggle('done',k<i); });
+  introKick.textContent=`Section ${i+1} of ${N} · ${SECTIONS[i].title}`;
+  pfill.style.width=((i+1)/N*100)+'%';
+  backbtn.disabled = i===0;
+  const last = i===N-1;
+  nextbtn.innerHTML = (last?'Generate Report ':'Next ')+ARROW;
+  footmsg.className='secmsg';
+  footmsg.textContent = '';   // clear any error when switching sections (no header hint)
+  if(appMain) appMain.scrollTo({top:0,behavior:'smooth'});   // scroll the content area, not the page
+}
+
+backbtn.addEventListener('click',()=>{ if(cur>0) show(cur-1); });
+nextbtn.addEventListener('click',()=>{
+  if(!validateSection(cur)) return;
+  if(cur<N-1) show(cur+1); else submitAll();
+});
+
+// sidebar jump: free when going back; validate intervening sections when going forward
+links.forEach((a,k)=>a.addEventListener('click',e=>{
+  e.preventDefault();
+  if(k<=cur){ show(k); return; }
+  for(let j=cur;j<k;j++){ if(!validateSection(j)){ show(j); return; } }
+  show(k);
+}));
+
+function submitAll(){
+  for(let i=0;i<N;i++){ if(!validateSection(i)){ show(i); return; } }
+  const data={};
+  for(let i=0;i<N;i++){
+    for(const f of SECTIONS[i].fields){
+      if(f.type==='sub'||f.type==='total') continue;
+      const el=document.getElementById('fld_'+f.k);
+      let val=el.value;
+      if(f.type==='num'){ val=val===''?0:parseFloat(val); if(isNaN(val)) val=0; }
+      else val=(val||'').trim();
+      data[f.k]=val;
+    }
+  }
+  // record only which unit was chosen — the value entered is used exactly as-is
+  // (calculations stay identical to the Excel sheet; the dropdown is just an added option)
+  for(const s of SECTIONS) for(const f of s.fields){
+    if(f.unitOpts){
+      const sel=document.getElementById('unit_'+f.k);
+      data[f.k+'_unit']=sel?sel.value:f.unitOpts[0];
+    }
+  }
+  data.C9=(+data.D9||0)+(+data.F9||0);
+  data.numAnimals=data.C9;
+  const now=new Date();
+  data.generatedAt=now.toISOString();
+  data.dateStr=now.toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  data.timeStr=now.toLocaleTimeString('en-IN');
+  data.genToken='g'+now.getTime();        // unique per generation (for tracking de-dupe)
+  sessionStorage.setItem('dairyData',JSON.stringify(data));
+  window.location.href='report.html';
+}
+
+// block letters/symbols in number-only fields as the user types
+const mob=document.getElementById('fld_mobile');
+if(mob){ mob.setAttribute('inputmode','numeric'); mob.setAttribute('maxlength','10');
+  mob.addEventListener('input',()=>{ mob.value=mob.value.replace(/\D/g,'').slice(0,10); }); }
+const aad=document.getElementById('fld_aadhar');
+if(aad){ aad.setAttribute('inputmode','numeric'); aad.setAttribute('maxlength','14');
+  aad.addEventListener('input',()=>{ aad.value=aad.value.replace(/[^\d ]/g,'').slice(0,14); }); }
+
+show(0);
+</script>
+</body>
+</html>

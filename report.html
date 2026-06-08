@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Report | Dairy Farming · VC&amp;RI Namakkal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gd:#14532d;--gm:#1B5E20;--gl:#2E7D32;--gp:#E8F5E9;--gold:#F9A825;--border:#c8dfc8;--text:#10241a;--muted:#546e7a}
+/* ════ APP SHELL: page does not scroll; only the report area scrolls ════ */
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:#eef3ee;color:var(--text);
+  height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.app-header{flex:none;z-index:100}
+.app-main{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
+
+/* SCREEN NAV (static — not sticky) */
+.screen-nav{background:var(--gd);color:#fff;padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:static;z-index:100}
+.screen-nav .mid{font-size:13px;color:rgba(255,255,255,.85)}
+.screen-nav .mid b{color:var(--gold)}
+.back-btn{color:rgba(255,255,255,.75);font-size:13px;display:flex;align-items:center;gap:6px;text-decoration:none}
+.back-btn:hover{color:#fff}
+
+.report-container{max-width:880px;margin:28px auto;padding:0 18px 70px}
+.rpage{background:#fff;margin-bottom:20px;border-radius:5px;box-shadow:0 3px 16px rgba(0,0,0,.09);overflow:hidden}
+.rpage-inner{padding:30px 38px 24px}
+
+/* page header */
+.pg-header{border-bottom:2px solid var(--gd);padding-bottom:12px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:flex-start}
+.pg-header h2{font-family:'Playfair Display',serif;font-size:13px;color:var(--gd);font-weight:800;letter-spacing:.4px;text-transform:uppercase}
+.pg-header p{font-size:10.5px;color:var(--muted);margin-top:2px}
+.pg-header .r{text-align:right;font-size:10.5px;color:var(--muted)}
+.pg-header .r b{display:block;font-size:12.5px;color:var(--text)}
+
+/* section title */
+.sec-title{background:linear-gradient(135deg,var(--gd),var(--gl));color:#fff;padding:9px 15px;font-size:13px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:15px;border-left:4px solid var(--gold);border-radius:3px}
+
+/* cover */
+.cover{padding:56px 44px;text-align:center;background:radial-gradient(900px 360px at 50% -30%,#e8f7ec,transparent)}
+.cover .univ{font-size:12px;font-weight:800;letter-spacing:1.5px;color:var(--gm);text-transform:uppercase}
+.cover .inst{font-size:13px;font-weight:700;color:var(--text);margin-top:4px}
+.cover .dept{font-size:11.5px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+.cover .seal{width:74px;height:74px;border-radius:50%;background:linear-gradient(140deg,var(--gm),var(--gl));display:grid;place-items:center;color:#fff;font-weight:800;font-size:22px;margin:24px auto;border:3px solid var(--gold);box-shadow:0 8px 22px rgba(27,94,32,.3)}
+.cover h1{font-family:'Playfair Display',serif;font-size:34px;color:var(--gd);margin-bottom:6px}
+.cover .subtitle{font-size:14px;color:var(--muted);margin-bottom:26px}
+.cover-line{width:80px;height:4px;background:var(--gold);margin:0 auto 26px;border-radius:2px}
+.cover-box{background:#fff;border:1px solid var(--border);border-radius:12px;padding:22px 26px;max-width:430px;margin:0 auto 24px;text-align:left;box-shadow:0 6px 20px rgba(20,83,45,.07)}
+.cover-box .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eef3ee;font-size:13px}
+.cover-box .row:last-child{border-bottom:none;padding-bottom:0}
+.cover-box .row span{color:var(--muted)}
+.cover-box .row b{color:var(--text);font-weight:700}
+.cover-foot{font-size:12px;color:var(--muted)}
+.cover-foot b{color:var(--gd)}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:14px}
+th{background:var(--gd);color:#fff;padding:8px 11px;text-align:left;font-weight:600;font-size:11.5px}
+th.num{text-align:right}
+td{padding:7px 11px;border-bottom:1px solid #eef3ee;vertical-align:top}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+tr:nth-child(even) td{background:#f8fbf8}
+tr.total td{background:var(--gp);font-weight:700;border-top:2px solid var(--gd)}
+tr.subtotal td{background:#eef6ee;font-weight:600}
+tr.sec-row td{background:#d8ecd8;font-weight:700;font-size:11px;letter-spacing:.3px;text-transform:uppercase;color:var(--gd)}
+.muted-cell{color:var(--muted)}
+
+/* glance */
+.glance .row{display:flex;border-bottom:1px solid #eef3ee;font-size:13px}
+.glance .row .k{flex:0 0 46%;padding:9px 12px;color:var(--muted);background:#f8fbf8}
+.glance .row .v{flex:1;padding:9px 12px;font-weight:600}
+.glance .grp{margin:16px 0 6px;font-size:11.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--gl)}
+
+/* highlight boxes */
+.hl{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.hl .b{flex:1;min-width:150px;background:var(--gp);border:1px solid var(--border);border-radius:9px;padding:13px 15px;border-left:4px solid var(--gd)}
+.hl .b.gold{border-left-color:var(--gold);background:#fffdf0}
+.hl .b.red{border-left-color:#c62828;background:#fff5f5}
+.hl .b label{font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;display:block;margin-bottom:3px}
+.hl .b .val{font-size:19px;font-weight:800;color:var(--gd)}
+.hl .b.gold .val{color:#b8860b}.hl .b.red .val{color:#c62828}
+.hl .b p{font-size:10.5px;color:var(--muted);margin-top:2px}
+
+.verdict{background:var(--gp);border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:9px;padding:14px 16px;margin-top:8px;font-size:12.5px}
+.verdict b{color:var(--gd)}
+.verdict .ok{color:var(--gm);font-weight:700}
+
+.pg-num{text-align:right;font-size:10.5px;color:var(--muted);padding-top:12px;border-top:1px solid var(--border);margin-top:6px}
+.pg-num .c{float:left;font-style:italic}
+.note{font-size:11px;color:var(--muted);margin:-6px 0 14px}
+
+/* nav actions */
+.nav-actions{display:flex;gap:10px}
+.nav-btn{display:flex;align-items:center;gap:8px;font-family:inherit;font-size:13.5px;font-weight:700;padding:9px 18px;border-radius:8px;cursor:pointer;border:none;transition:.2s;background:var(--gold);color:#3a2c00}
+.nav-btn:hover{background:#ffba2e;transform:translateY(-1px)}
+.nav-btn.ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.4)}
+.nav-btn.ghost:hover{background:rgba(255,255,255,.12)}
+
+/* modals */
+.modal-bg{position:fixed;inset:0;background:rgba(8,28,16,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:300;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:16px;max-width:470px;width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);animation:pop .22s ease}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+.modal-head{padding:17px 22px;color:#fff;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--gd),var(--gl))}
+.modal-head.ok{background:linear-gradient(135deg,#1B5E20,#2E7D32)}
+.modal-head .mh-ic{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;flex:none;font-size:18px;font-weight:800}
+.modal-head h3{font-size:16px;font-weight:800}
+.modal-head p{font-size:11.5px;color:rgba(255,255,255,.82);margin-top:1px}
+.modal-body{padding:18px 22px}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #eef3ee;font-size:13.5px}
+.srow:last-child{border-bottom:none}
+.srow span{color:var(--muted)}.srow b{font-weight:700;color:var(--text)}
+.srow b.pill{background:var(--gp);color:var(--gm);padding:2px 11px;border-radius:14px}
+.viable-note{display:flex;gap:14px;align-items:center;background:var(--gp);border:1px solid var(--border);border-radius:11px;padding:15px 16px;font-size:13px;color:var(--text);line-height:1.5}
+.viable-note .big{font-size:30px;font-weight:800;color:var(--gm);flex:none;line-height:1}
+.viable-note b{color:var(--gd)}
+.modal-foot{padding:14px 22px 20px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #eef3ee}
+.mbtn{font-family:inherit;font-size:14px;font-weight:700;padding:11px 20px;border-radius:9px;cursor:pointer;border:none;transition:.15s;display:inline-flex;align-items:center;gap:8px}
+.mbtn.primary{background:var(--gold);color:#3a2c00}.mbtn.primary:hover{background:#ffba2e}
+.mbtn.ghost{background:#fff;color:var(--muted);border:1.5px solid var(--border)}.mbtn.ghost:hover{background:var(--cream)}
+
+@media print{
+  html,body{height:auto!important;overflow:visible!important;display:block!important}
+  body{background:#fff!important}
+  .app-header,.app-footer,.screen-nav,.modal-bg{display:none!important}
+  .app-main{overflow:visible!important;height:auto!important}
+  .report-container{max-width:100%;margin:0;padding:0}
+  .rpage{margin:0;box-shadow:none;border-radius:0;page-break-after:always}
+  .rpage:last-child{page-break-after:avoid}
+  .rpage-inner{padding:13mm 15mm}
+  @page{size:A4;margin:0}
+}
+/* export mode (for direct PDF save via html2pdf) — neutralise the app shell */
+body.exporting{background:#fff;display:block;height:auto;overflow:visible}
+body.exporting .app-header,body.exporting .app-footer{display:none}
+body.exporting .app-main{overflow:visible;height:auto}
+body.exporting .report-container{max-width:794px;margin:0;padding:0}
+body.exporting .rpage{margin:0;box-shadow:none;border-radius:0;page-break-before:always}
+body.exporting .rpage:first-child{page-break-before:auto}
+body.exporting .rpage-inner{padding:13mm 14mm}
+/* ════ RESPONSIVE (mobile-first) ════ */
+@media(max-width:860px){
+  .report-container{margin:16px auto;padding:0 12px 40px}
+  .screen-nav{padding:0 14px;height:auto;min-height:56px;flex-wrap:wrap;gap:8px;padding-top:8px;padding-bottom:8px}
+  .screen-nav .mid{display:none}
+  .nav-actions{gap:8px;flex:1;justify-content:flex-end}
+  .nav-btn{padding:9px 14px;font-size:12.5px}
+}
+@media(max-width:620px){
+  .rpage-inner{padding:18px 14px}
+  .cover{padding:30px 16px}
+  .cover h1{font-size:26px}
+  /* wide tables scroll horizontally inside the page instead of breaking the layout */
+  .rpage table{display:block;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .hl{flex-direction:column}
+  .hl .b{min-width:0}
+  .glance .row{flex-direction:column}
+  .glance .row .k{flex:none;width:100%}
+}
+@media(max-width:420px){
+  .screen-nav .back-btn span,.nav-btn{font-size:12px}
+  .nav-btn{padding:8px 12px}
+  .cover h1{font-size:23px}
+  .sec-title{font-size:12px;padding:8px 12px}
+}
+</style>
+</head>
+<body>
+
+<!-- ░░ FIXED HEADER ░░ -->
+<header class="app-header">
+  <div class="screen-nav">
+    <a class="back-btn" href="form.html">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Edit Details
+    </a>
+    <div class="mid"><b>Bankable Dairy Project Report</b></div>
+    <div class="nav-actions">
+      <button class="nav-btn ghost" id="previewBtn">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Preview Summary
+      </button>
+      <button class="nav-btn" id="downloadBtn">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2zM17 21v-8H7v8M7 3v5h8"/></svg>
+        Save PDF
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ░░ SCROLLABLE MAIN (fixed header above · no footer) ░░ -->
+<main class="app-main">
+  <div class="report-container" id="out"></div>
+</main>
+
+<script src="html2pdf.bundle.min.js"></script>
+<script>
+// ════════════════════ LOAD DATA ════════════════════
+const D = JSON.parse(sessionStorage.getItem('dairyData')||'null');
+if(!D){ document.getElementById('out').innerHTML='<div style="padding:70px;text-align:center;font-size:16px">No data found. <a href="form.html" style="color:#1B5E20;font-weight:700">Fill the form →</a></div>'; throw new Error('no data'); }
+const P = k => { const v=D[k]; return typeof v==='number'?v:(parseFloat(v)||0); };
+const S = k => (D[k]||'').toString().trim();
+
+// ════════════════════ HELPERS ════════════════════
+const INR = n => '₹ '+Math.round(n).toLocaleString('en-IN');
+const NUM = n => Math.round(n).toLocaleString('en-IN');
+const F2  = n => (Math.round(n*100)/100).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const roundDown2 = x => Math.floor(x/100)*100;
+function pmt(rate,nper,pv){ if(!nper) return 0; if(rate===0) return pv/nper; return pv*rate*Math.pow(1+rate,nper)/(Math.pow(1+rate,nper)-1); }
+const ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV'];
+
+// ════════════════════ CALC ENGINE (faithful to Excel) ════════════════════
+const NY = Math.max(1, Math.round(P('C54')));      // projection years = repayment period
+
+// ── Investment: capital ──
+const animalCost  = P('C9')*P('C10');
+const animalShed  = roundDown2(P('C9')*P('C16')*P('C17'));
+const calfPen     = P('C9')/2*P('C18')*P('C19');
+const storeRoom   = P('C20')*P('C21');
+const labourQ     = P('C37')*P('C38');
+const feeder      = P('C9')*P('C24');
+const cap = [
+  ['Cost of Milch Animals', animalCost],
+  ['Construction — Animal Shed', animalShed],
+  ['Construction — Calves Pen', calfPen],
+  ['Construction — Store Room', storeRoom],
+  ['Construction — Labour Quarters', labourQ],
+  ['Feeder & Waterer Equipment', feeder],
+  ['Milking Can', P('C25')],
+  ['Milking Machine', P('C26')],
+  ['Chaff Cutter', P('C27')],
+  ['Brush Cutter', P('C28')],
+  ['Feed Making Machinery', P('C29')],
+  ['Milk Processing Machinery', P('C30')],
+  ['Motor for Irrigation', P('C31')],
+  ['Sprinkler & Fogger', P('C32')],
+  ['Overhead Tank', P('C39')],
+  ['Fencing', P('C40')],
+  ['Land Levelling', P('C41')],
+  ['Borewell', P('C42')],
+  ['Feed Mill Construction', P('C43')*P('C44')],
+  ['Milk Processing Unit Construction', P('C45')*P('C46')],
+  ['Bio Gas Unit', P('C47')],
+  ['Vermicompost Unit', P('C48')],
+  ['Silage Making Unit', P('C49')],
+  ['Vehicle', (P('C58')*P('C59'))+(P('C60')*P('C61'))],
+  ['Computers', P('C33')],
+  ['CCTV', P('C34')],
+];
+const totalCapital = roundDown2(cap.reduce((a,[,v])=>a+v,0));
+
+// ── Investment: working capital (3 months) ──
+const wc = [
+  ['Insurance Premium', animalCost*P('C12')/100],
+  ['Transport Charges', P('C9')*P('C13')],
+  ['Concentrate Feed (3 mo.)', P('D9')*P('C66')*P('C68')*90],
+  ['Dry Fodder (3 mo.)', P('D9')*P('C69')*P('C70')*90],
+  ['Green Fodder', P('C71')*P('C72')],
+  ['Labour Wages (3 mo.)', ((P('C86')*P('C87'))+(P('C88')*P('C89'))+(P('C90')*P('C91'))+(P('C92')*P('C93')))*3],
+  ['Veterinary Expenses', P('C74')*P('D9')],
+  ['Electricity (3 mo.)', P('C75')*3],
+  ['Fuel (3 mo.)', P('C76')*3],
+  ['Miscellaneous', P('C79')*P('D9')],
+  ['Feed Making Unit (3 mo.)', P('C80')/12*3],
+  ['Milk Processing Unit (3 mo.)', P('C81')/12*3],
+  ['Vermicompost Unit (3 mo.)', P('C82')/12*3],
+  ['Silage Making Unit (3 mo.)', P('C83')/12*3],
+];
+const totalWC = roundDown2(wc.reduce((a,[,v])=>a+v,0));
+const totalProject = roundDown2(totalCapital + totalWC);
+const marginAmt = totalProject*P('C52')/100;
+const loanAmt   = totalProject - marginAmt;
+const subsidyAmt= totalProject*P('C55')/100;
+
+// ── Repayment schedule (monthly, 3-month moratorium) ──
+const months = NY*12, mRate = P('C53')/100/12, emi = pmt(mRate, months, loanAmt), MORA=3;
+let bal=loanAmt; const monthly=[];
+for(let m=1;m<=months;m++){
+  let intr=bal*mRate, prin, pay;
+  if(m<=MORA){ prin=0; pay=intr; }
+  else { prin=emi-intr; pay=emi; bal-=prin; if(bal<-0.01){prin+=bal;pay+=bal;bal=0;} else if(bal<0){bal=0;} }
+  monthly.push({m,pay,prin,intr,bal:Math.max(0,bal)});
+}
+const yrInt=[], yrPrin=[];
+for(let y=0;y<NY;y++){ let si=0,sp=0; for(let m=y*12;m<(y+1)*12;m++){ si+=monthly[m].intr; sp+=monthly[m].prin; } yrInt.push(si); yrPrin.push(sp); }
+
+// ── Depreciation (declining balance) ──
+const bldgBase  = animalShed+calfPen+storeRoom+labourQ;
+const equipBase = feeder+P('C25')+P('C26')+P('C27')+P('C28')+P('C29')+P('C30')+P('C31')+P('C32');
+const depB=[],depE=[]; let bb=bldgBase, eb=equipBase;
+const depTable=[];
+for(let y=0;y<NY;y++){
+  const dbB=bb*P('C77')/100, dbE=eb*P('C78')/100;
+  depTable.push({y:y+1,bBeg:bb,bDep:dbB,bEnd:bb-dbB,eBeg:eb,eDep:dbE,eEnd:eb-dbE});
+  depB.push(dbB); depE.push(dbE); bb-=dbB; eb-=dbE;
+}
+const totalDep = depB.map((b,y)=>b+depE[y]);
+
+// ── Production ──
+const milkB1 = Array.from({length:NY},()=>P('D9')*P('C64')*P('C11'));
+const milkB2 = Array.from({length:NY},(_,y)=> y===0 ? P('F9')*180*P('C11') : P('F9')*P('C64')*P('C11'));
+const milkQty = milkB1.map((b,y)=>b+milkB2[y]);
+
+// ── Income ──
+const milkInc   = milkQty.map(q=>q*P('C96'));
+const maleCalf  = (P('C9')/2)*P('C97');
+const femaleCalf= (P('C9')/2)*P('C98');
+const manure    = P('C99')*P('C9');
+const otherInc  = maleCalf+femaleCalf+manure+P('C100')+P('C101');
+const totalIncome = milkInc.map(m=>m+otherInc);
+
+// ── Expenditure (per year) ──
+const insurance   = animalCost*P('C12')/100;
+const labourAnnual= ((P('C86')*P('C87'))+(P('C88')*P('C89'))+(P('C90')*P('C91'))+(P('C92')*P('C93')))*12;
+const vetAnnual   = P('C74')*P('C9');
+const elecAnnual  = P('C75')*12;
+const fuelAnnual  = P('C76')*12;
+const miscAnnual  = P('C79')*P('C9');
+const dryFodderAnnual = P('C9')*365*P('C69')*P('C70');
+const unitExp = P('C80')+P('C81')+P('C82')+P('C83');
+// Concentrate — corrected (full milking + full dry, days×kg×cost)
+const concentrate = Array.from({length:NY},(_,y)=> y===0
+  ? P('D9')*P('C64')*P('C66')*P('C68') + P('F9')*180*P('C66')*P('C68') + P('D9')*P('C65')*P('C67')*P('C68')
+  : P('C9')*P('C64')*P('C66')*P('C68') + P('C9')*P('C65')*P('C67')*P('C68'));
+const greenFodder = Array.from({length:NY},(_,y)=> y===0 ? P('C71')*P('C72') : P('C71')*P('C73'));
+const transport   = Array.from({length:NY},(_,y)=> y===0 ? P('C9')*P('C13') : 0);
+
+const expRows = [
+  ['Insurance Premium', y=>insurance],
+  ['Transport Charges', y=>transport[y]],
+  ['Concentrate Feed', y=>concentrate[y]],
+  ['Dry Fodder', y=>dryFodderAnnual],
+  ['Green Fodder', y=>greenFodder[y]],
+  ['Labour Wages', y=>labourAnnual],
+  ['Veterinary Expenses', y=>vetAnnual],
+  ['Electricity', y=>elecAnnual],
+  ['Fuel', y=>fuelAnnual],
+  ['Miscellaneous', y=>miscAnnual],
+  ['Add-on Unit Expenses', y=>unitExp],
+  ['Interest on Loan', y=>yrInt[y]],
+  ['Depreciation — Building', y=>depB[y]],
+  ['Depreciation — Equipment', y=>depE[y]],
+];
+const totalExp = Array.from({length:NY},(_,y)=> expRows.reduce((a,[,fn])=>a+fn(y),0));
+const netIncome = totalIncome.map((ti,y)=>ti-totalExp[y]);
+
+// ── Financial Analysis ──
+const r = P('C53')/100;
+const df=[],pwExp=[],pwBen=[];
+for(let y=0;y<NY;y++){ const f=1/Math.pow(1+r,y+1); df.push(f); pwExp.push(totalExp[y]*f); pwBen.push(totalIncome[y]*f); }
+const sumPWexp=pwExp.reduce((a,b)=>a+b,0), sumPWben=pwBen.reduce((a,b)=>a+b,0);
+const npv = sumPWben - sumPWexp;
+const bcr = sumPWexp? sumPWben/sumPWexp : 0;
+const rHigh=(P('C53')+20)/100;
+const inb = totalIncome.map((ti,y)=>ti-totalExp[y]);          // FIX: every year uses Total Revenue
+const pvLow = inb.reduce((a,v,y)=>a+v/Math.pow(1+r,y+1),0);
+const pvHigh= inb.reduce((a,v,y)=>a+v/Math.pow(1+rHigh,y+1),0);
+const irr = P('C53') + 20*(pvLow/((pvLow+pvHigh)||1));
+
+// ── DSCR ──
+const dscrNum = netIncome.map((nr,y)=>nr+yrInt[y]+totalDep[y]);
+const dscrDen = yrPrin.map((p,y)=>p+yrInt[y]);
+const dscr = dscrNum.map((n,y)=> dscrDen[y]? n/dscrDen[y] : 0);
+const avgDscr = dscrNum.reduce((a,b)=>a+b,0)/(dscrDen.reduce((a,b)=>a+b,0)||1);
+
+// ════════════════════ RENDER ════════════════════
+const YH = Array.from({length:NY},(_,y)=>ROMAN[y]+' Year');
+const yhCols = YH.map(h=>`<th class="num">${h}</th>`).join('');
+const animalLabel = `${S('C7')||'Cow'}${S('C8')?' / '+S('C8'):''}`;
+
+// DISPLAY-ONLY rule: with 0 animals, blank the summary ratios (no calculation is changed).
+const ZERO = P('C9') <= 0;
+const dNPV  = ZERO ? '—' : INR(npv);
+const dBCR  = ZERO ? '—' : F2(bcr);
+const dIRR  = ZERO ? '—' : F2(irr)+'%';
+const dDSCR = ZERO ? '—' : F2(avgDscr);
+const dDSCRy = y => ZERO ? '—' : F2(dscr[y]);
+
+function pgHeader(){
+  return `<div class="pg-header">
+    <div><h2>Veterinary College &amp; Research Institute, Namakkal</h2><p>Dept. of Animal Husbandry Economics — Bankable Dairy Project Report</p></div>
+    <div class="r"><b>${S('farmerName')||'—'}</b>${D.dateStr||''}<br>${S('mobile')?'Ph: '+S('mobile'):''}</div>
+  </div>`;
+}
+let pageNo=0;
+function page(content){ pageNo++; return `<div class="rpage"><div class="rpage-inner">${pgHeader()}${content}
+   <div class="pg-num"><span class="c">Guided by Dr. V. Senthilkumar, Prof. &amp; Head, Dept. of AH Economics</span> Page ${pageNo}</div></div></div>`; }
+const rowsFn = (rows)=>rows.map(([lbl,fn])=>`<tr><td>${lbl}</td>${Array.from({length:NY},(_,y)=>`<td class="num">${INR(fn(y))}</td>`).join('')}</tr>`).join('');
+
+let html='';
+
+// ── COVER ──
+html += `<div class="rpage"><div class="cover">
+  <div class="univ">Tamil Nadu Veterinary &amp; Animal Sciences University</div>
+  <div class="inst">Veterinary College &amp; Research Institute, Namakkal</div>
+  <div class="dept">Department of Animal Husbandry Economics</div>
+  <div class="seal">VC<span style="font-size:11px">RI</span></div>
+  <h1>Project Report on Dairy Farming</h1>
+  <div class="subtitle">Bankable Project Report &nbsp;·&nbsp; ${NY}-Year Financial Appraisal</div>
+  <div class="cover-line"></div>
+  <div class="cover-box">
+    <div class="row"><span>Name of the Farmer / Unit</span><b>${S('farmerName')||'—'}</b></div>
+    <div class="row"><span>Type of Animal</span><b>${animalLabel}</b></div>
+    <div class="row"><span>Number of Animals</span><b>${NUM(P('C9'))}</b></div>
+    <div class="row"><span>Total Project Cost</span><b>${INR(totalProject)}</b></div>
+    <div class="row"><span>Bank Loan</span><b>${INR(loanAmt)}</b></div>
+    <div class="row"><span>Repayment Period</span><b>${NY} Years</b></div>
+    <div class="row"><span>Date of Report</span><b>${D.dateStr||''}</b></div>
+  </div>
+  <div class="cover-foot">Prepared using the VC&amp;RI Dairy Project tool &nbsp;·&nbsp; Guided by <b>Dr. V. Senthilkumar</b></div>
+</div></div>`;
+
+// ── PROJECT AT A GLANCE ──
+html += page(`
+<div class="sec-title">Project at a Glance</div>
+<table>
+  <tr><th style="width:46%">Particulars</th><th>Details</th></tr>
+  <tr><td>1. Name of the Farmer / Unit</td><td>${S('farmerName')||'—'}</td></tr>
+  <tr><td>2. Address of the Farmer</td><td>${S('farmerAddress')||'—'}</td></tr>
+  <tr><td>3. Aadhar Number (optional)</td><td>${S('aadhar')||'—'}</td></tr>
+  <tr><td>4. Mobile Number</td><td>${S('mobile')||'—'}</td></tr>
+  <tr><td>5. E-mail Id (optional)</td><td>${S('email')||'—'}</td></tr>
+  <tr><td>6. Nature of Farming / Activity</td><td>${S('natureFarming')||'Dairy Farming'} — ${NUM(P('C9'))} animals (${animalLabel})</td></tr>
+  <tr><td>7. Address / Location of the Farm</td><td>${S('farmLocation')||'—'}</td></tr>
+  <tr><td>8. Name of the Financing Bank</td><td>${S('bankName')||'—'}</td></tr>
+  <tr><td>9. Name of the Branch</td><td>${S('branchName')||'—'}</td></tr>
+</table>
+<table>
+  <tr><th style="width:46%">Particulars</th><th class="num">Amount (Rs.)</th></tr>
+  <tr class="sec-row"><td colspan="2">10 · Project Cost</td></tr>
+  <tr><td>Capital &amp; Machinery Investment</td><td class="num">${INR(totalCapital)}</td></tr>
+  <tr><td>Working Capital</td><td class="num">${INR(totalWC)}</td></tr>
+  <tr class="total"><td>Total Cost of the Project</td><td class="num">${INR(totalProject)}</td></tr>
+  <tr class="sec-row"><td colspan="2">11 · Means of Finance</td></tr>
+  <tr><td>Bank Loan</td><td class="num">${INR(loanAmt)}</td></tr>
+  <tr><td>Margin Money</td><td class="num">${INR(marginAmt)}</td></tr>
+  <tr><td>Subsidy (${F2(P('C55'))}% of project cost)</td><td class="num">${INR(subsidyAmt)}</td></tr>
+  <tr><td>Rate of Interest</td><td class="num">${F2(P('C53'))}% per annum</td></tr>
+  <tr><td>Repayment Period</td><td class="num">${NY} years</td></tr>
+</table>
+<table>
+  <tr><th style="width:46%">12 · Project Evaluation</th><th class="num">Value</th></tr>
+  <tr><td>Net Present Value (NPV)</td><td class="num">${dNPV}</td></tr>
+  <tr><td>Benefit–Cost Ratio (BCR)</td><td class="num">${dBCR}</td></tr>
+  <tr><td>Internal Rate of Return (IRR)</td><td class="num">${dIRR}</td></tr>
+  <tr><td>Debt Service Coverage Ratio (avg)</td><td class="num">${dDSCR}</td></tr>
+</table>`);
+
+// ── INVESTMENT ──
+html += page(`
+<div class="sec-title">Investment of the Project</div>
+<table>
+  <tr><th>Particulars</th><th class="num">Amount (Rs.)</th></tr>
+  <tr class="sec-row"><td>A — Capital / Fixed Investment</td><td></td></tr>
+  ${cap.filter(([,v])=>v>0).map(([l,v])=>`<tr><td>${l}</td><td class="num">${INR(v)}</td></tr>`).join('')}
+  <tr class="total"><td>Total Capital Investment</td><td class="num">${INR(totalCapital)}</td></tr>
+  <tr class="sec-row"><td>B — Working Capital (3 months)</td><td></td></tr>
+  ${wc.filter(([,v])=>v>0).map(([l,v])=>`<tr><td>${l}</td><td class="num">${INR(v)}</td></tr>`).join('')}
+  <tr class="total"><td>Total Working Capital</td><td class="num">${INR(totalWC)}</td></tr>
+  <tr class="total"><td>Total Cost of the Project</td><td class="num">${INR(totalProject)}</td></tr>
+</table>
+<div class="sec-title">Means of Finance</div>
+<table>
+  <tr><th>Particulars</th><th class="num">Amount (Rs.)</th></tr>
+  <tr><td>Loan from Bank (${F2(100-P('C52'))}%)</td><td class="num">${INR(loanAmt)}</td></tr>
+  <tr><td>Margin Money (${F2(P('C52'))}%)</td><td class="num">${INR(marginAmt)}</td></tr>
+  <tr class="total"><td>Total</td><td class="num">${INR(loanAmt+marginAmt)}</td></tr>
+  <tr><td>Subsidy available (${F2(P('C55'))}% of project cost)</td><td class="num">${INR(subsidyAmt)}</td></tr>
+</table>`);
+
+// ── PRODUCTION ──
+html += page(`
+<div class="sec-title">Production Chart — Milk Yield Projection</div>
+<table>
+  <tr><th>Particulars</th>${yhCols}</tr>
+  <tr><td>First Batch (${NUM(P('D9'))} animals × ${F2(P('C11'))} L × ${NUM(P('C64'))} days)</td>${milkB1.map(v=>`<td class="num">${NUM(v)}</td>`).join('')}</tr>
+  <tr><td>Second Batch (${NUM(P('F9'))} animals, staggered in Yr 1)</td>${milkB2.map(v=>`<td class="num">${NUM(v)}</td>`).join('')}</tr>
+  <tr class="total"><td>Total Milk Yield (Litres)</td>${milkQty.map(v=>`<td class="num">${NUM(v)}</td>`).join('')}</tr>
+</table>
+<div class="hl">
+  <div class="b"><label>Year 1 Yield</label><div class="val">${NUM(milkQty[0])} L</div><p>2nd batch joins mid-year</p></div>
+  <div class="b"><label>Year 2+ Yield</label><div class="val">${NUM(milkQty[1]||milkQty[0])} L</div><p>Full herd, both batches</p></div>
+  <div class="b gold"><label>Daily Yield (full)</label><div class="val">${NUM(P('C9')*P('C11'))} L</div><p>${NUM(P('C9'))} animals × ${F2(P('C11'))} L</p></div>
+</div>
+<p class="note">Milk sold @ ${INR(P('C96'))}/litre · Milking period ${NUM(P('C64'))} days · Dry period ${NUM(P('C65'))} days.</p>`);
+
+// ── EXPENDITURE & INCOME ──
+html += page(`
+<div class="sec-title">Expenditure &amp; Income Statement</div>
+<table>
+  <tr><th>Particulars</th>${yhCols}</tr>
+  <tr class="sec-row"><td>Income</td>${YH.map(()=>'<td></td>').join('')}</tr>
+  <tr><td>By Sale of Milk</td>${milkInc.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+  <tr><td>By Sale of Male Calves</td>${YH.map(()=>`<td class="num">${INR(maleCalf)}</td>`).join('')}</tr>
+  <tr><td>By Value of Female Calves</td>${YH.map(()=>`<td class="num">${INR(femaleCalf)}</td>`).join('')}</tr>
+  <tr><td>By Sale of Manure</td>${YH.map(()=>`<td class="num">${INR(manure)}</td>`).join('')}</tr>
+  <tr class="total"><td>Total Income</td>${totalIncome.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+  <tr class="sec-row"><td>Expenditure</td>${YH.map(()=>'<td></td>').join('')}</tr>
+  ${rowsFn(expRows)}
+  <tr class="total"><td>Total Expenditure</td>${totalExp.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+  <tr class="subtotal"><td>Net Income</td>${netIncome.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+</table>`);
+
+// ── CASH FLOW ──
+html += page(`
+<div class="sec-title">Cash Flow Statement</div>
+<table>
+  <tr><th>Particulars</th>${yhCols}</tr>
+  <tr><td>Total Revenue</td>${totalIncome.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+  <tr><td>Total Expenditure</td>${totalExp.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+  <tr class="subtotal"><td>Net Revenue</td>${netIncome.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+  <tr><td>Add: Interest</td>${yrInt.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+  <tr><td>Add: Depreciation</td>${totalDep.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+  <tr class="total"><td>Net Cash Accruals (for Debt Service)</td>${dscrNum.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+</table>
+<p class="note">Net Cash Accruals = Net Revenue + Interest + Depreciation — the cash available each year to service the loan.</p>`);
+
+// ── REPAYMENT (annual) ──
+html += page(`
+<div class="sec-title">Loan Repayment — Annual Summary</div>
+<div class="hl">
+  <div class="b"><label>Loan Amount</label><div class="val">${INR(loanAmt)}</div></div>
+  <div class="b gold"><label>Monthly EMI</label><div class="val">${INR(emi)}</div><p>from Month ${MORA+1}</p></div>
+  <div class="b"><label>Interest Rate</label><div class="val">${F2(P('C53'))}%</div><p>${MORA}-month moratorium</p></div>
+</div>
+<table>
+  <tr><th>Year</th><th class="num">Opening Balance</th><th class="num">Principal Paid</th><th class="num">Interest Paid</th><th class="num">Total Instalment</th><th class="num">Closing Balance</th></tr>
+  ${(()=>{ let open=loanAmt; let rows=''; for(let y=0;y<NY;y++){ const close=open-yrPrin[y]; rows+=`<tr><td>${YH[y]}</td><td class="num">${INR(open)}</td><td class="num">${INR(yrPrin[y])}</td><td class="num">${INR(yrInt[y])}</td><td class="num">${INR(yrPrin[y]+yrInt[y])}</td><td class="num">${INR(Math.max(0,close))}</td></tr>`; open=close; } return rows; })()}
+  <tr class="total"><td>Total</td><td></td><td class="num">${INR(yrPrin.reduce((a,b)=>a+b,0))}</td><td class="num">${INR(yrInt.reduce((a,b)=>a+b,0))}</td><td class="num">${INR(yrPrin.reduce((a,b)=>a+b,0)+yrInt.reduce((a,b)=>a+b,0))}</td><td></td></tr>
+</table>`);
+
+// ── REPAYMENT (monthly) ──
+html += page(`
+<div class="sec-title">Loan Repayment — Monthly Schedule (${months} Months)</div>
+<table>
+  <tr><th>Month</th><th class="num">Instalment</th><th class="num">Principal</th><th class="num">Interest</th><th class="num">Balance</th></tr>
+  <tr class="subtotal"><td colspan="4">Loan Disbursed</td><td class="num">${INR(loanAmt)}</td></tr>
+  ${monthly.map(r=>`<tr ${r.m<=MORA?'class="subtotal"':''}><td>Month ${r.m}${r.m<=MORA?' (Moratorium)':''}</td><td class="num">${F2(r.pay)}</td><td class="num">${r.prin?F2(r.prin):'—'}</td><td class="num">${F2(r.intr)}</td><td class="num">${F2(r.bal)}</td></tr>`).join('')}
+</table>`);
+
+// ── DEPRECIATION ──
+html += page(`
+<div class="sec-title">Depreciation — Declining Balance Method</div>
+<p class="note">Buildings @ ${F2(P('C77'))}% &nbsp;·&nbsp; Equipment @ ${F2(P('C78'))}% per annum.</p>
+<table>
+  <tr><th rowspan="2">Year</th><th colspan="3" style="text-align:center">Buildings</th><th colspan="3" style="text-align:center">Equipment</th></tr>
+  <tr><th class="num">Beginning</th><th class="num">Depreciation</th><th class="num">End Value</th><th class="num">Beginning</th><th class="num">Depreciation</th><th class="num">End Value</th></tr>
+  ${depTable.map(d=>`<tr><td>${ROMAN[d.y-1]}</td><td class="num">${INR(d.bBeg)}</td><td class="num">${INR(d.bDep)}</td><td class="num">${INR(d.bEnd)}</td><td class="num">${INR(d.eBeg)}</td><td class="num">${INR(d.eDep)}</td><td class="num">${INR(d.eEnd)}</td></tr>`).join('')}
+</table>`);
+
+// ── FINANCIAL ANALYSIS ──
+const viable = npv>0 && bcr>1 && irr>P('C53') && avgDscr>1.5;
+html += page(`
+<div class="sec-title">Financial Analysis of the Project</div>
+<table>
+  <tr><th>Year</th><th class="num">Expenditure</th><th class="num">Revenue</th><th class="num">Discount Factor @ ${F2(P('C53'))}%</th><th class="num">PW of Cost</th><th class="num">PW of Benefit</th></tr>
+  ${Array.from({length:NY},(_,y)=>`<tr><td>${ROMAN[y]}</td><td class="num">${INR(totalExp[y])}</td><td class="num">${INR(totalIncome[y])}</td><td class="num">${df[y].toFixed(3)}</td><td class="num">${INR(pwExp[y])}</td><td class="num">${INR(pwBen[y])}</td></tr>`).join('')}
+  <tr class="total"><td>Total</td><td></td><td></td><td></td><td class="num">${INR(sumPWexp)}</td><td class="num">${INR(sumPWben)}</td></tr>
+</table>
+<div class="hl">
+  <div class="b ${ZERO?'':(npv>0?'':'red')}"><label>Net Present Value</label><div class="val">${dNPV}</div><p>${ZERO?'No animals entered':(npv>0?'Positive — viable':'Negative — review')}</p></div>
+  <div class="b ${ZERO?'':(bcr>1?'':'red')}"><label>Benefit–Cost Ratio</label><div class="val">${dBCR}</div><p>${ZERO?'No animals entered':(bcr>1?'Above 1 — beneficial':'Below 1')}</p></div>
+  <div class="b gold"><label>Internal Rate of Return</label><div class="val">${dIRR}</div><p>${ZERO?'No animals entered':'vs '+F2(P('C53'))+'% lending rate'}</p></div>
+</div>
+<div class="sec-title" style="margin-top:18px">Debt Service Coverage Ratio</div>
+<table>
+  <tr><th>Year</th><th class="num">Net Cash Accruals</th><th class="num">Debt Obligation</th><th class="num">DSCR</th></tr>
+  ${Array.from({length:NY},(_,y)=>`<tr><td>${ROMAN[y]}</td><td class="num">${INR(dscrNum[y])}</td><td class="num">${INR(dscrDen[y])}</td><td class="num">${dDSCRy(y)}</td></tr>`).join('')}
+  <tr class="total"><td>Average DSCR</td><td></td><td></td><td class="num">${dDSCR}</td></tr>
+</table>
+<div class="verdict">
+  <b>Verdict:</b> ${ZERO
+    ? `No animals entered (unit size = 0) — enter a herd size to evaluate the project's viability ratios.`
+    : (viable
+      ? `<span class="ok">The project is financially viable and bankable.</span> NPV is positive, BCR exceeds 1, IRR (${F2(irr)}%) is above the lending rate, and the average DSCR (${F2(avgDscr)}) is comfortably above the 1.5 norm.`
+      : `Review required — one or more indicators are below the bankable threshold (NPV>0, BCR>1, IRR>interest rate, DSCR>1.5).`)}
+</div>`);
+
+document.getElementById('out').innerHTML = html;
+
+// ════════════════════ ACTIONS — Preview Summary & Download PDF ════════════════════
+const dscrViable = avgDscr >= 2;   // viable notification threshold (DSCR ≥ 2)
+
+const previewModal = document.createElement('div');
+previewModal.className = 'modal-bg';
+previewModal.innerHTML = `
+  <div class="modal">
+    <div class="modal-head">
+      <div class="mh-ic"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></div>
+      <div><h3>Project Summary</h3><p>${(S('farmerName')||'Dairy Project')} · ${animalLabel} · ${NUM(P('C9'))} animals</p></div>
+    </div>
+    <div class="modal-body">
+      <div class="srow"><span>Total Project Cost</span><b>${INR(totalProject)}</b></div>
+      <div class="srow"><span>Bank Loan</span><b>${INR(loanAmt)}</b></div>
+      <div class="srow"><span>Margin Money</span><b>${INR(marginAmt)}</b></div>
+      <div class="srow"><span>Net Present Value (NPV)</span><b class="pill">${dNPV}</b></div>
+      <div class="srow"><span>Benefit–Cost Ratio (BCR)</span><b class="pill">${dBCR}</b></div>
+      <div class="srow"><span>Internal Rate of Return (IRR)</span><b class="pill">${dIRR}</b></div>
+      <div class="srow"><span>Average DSCR</span><b class="pill">${dDSCR}</b></div>
+    </div>
+    <div class="modal-foot">
+      <button class="mbtn ghost" data-close>Close</button>
+      <button class="mbtn primary" id="pmDownload">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2zM17 21v-8H7v8M7 3v5h8"/></svg>
+        Save PDF
+      </button>
+    </div>
+  </div>`;
+document.body.appendChild(previewModal);
+
+const viableModal = document.createElement('div');
+viableModal.className = 'modal-bg';
+viableModal.innerHTML = `
+  <div class="modal">
+    <div class="modal-head ok">
+      <div class="mh-ic">✓</div>
+      <div><h3>Project is Viable</h3><p>Bankable — ready to save</p></div>
+    </div>
+    <div class="modal-body">
+      <div class="viable-note">
+        <div class="big">${F2(avgDscr)}</div>
+        <div>The <b>Debt Service Coverage Ratio is ${F2(avgDscr)}</b> (≥ 2.0). The project comfortably services its loan and is <b>bankable &amp; viable</b>.<br>You can now save the report as a PDF.</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="mbtn ghost" data-close>Cancel</button>
+      <button class="mbtn primary" id="vmDownload">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2zM17 21v-8H7v8M7 3v5h8"/></svg>
+        Save PDF
+      </button>
+    </div>
+  </div>`;
+document.body.appendChild(viableModal);
+
+// shown when the user generated with 0 animals — asks them to go back and enter a value
+const zeroModal = document.createElement('div');
+zeroModal.className = 'modal-bg';
+zeroModal.innerHTML = `
+  <div class="modal">
+    <div class="modal-head" style="background:linear-gradient(135deg,#8a1c1c,#c62828)">
+      <div class="mh-ic">!</div>
+      <div><h3>Enter Number of Animals</h3><p>Unit size is currently 0</p></div>
+    </div>
+    <div class="modal-body">
+      <div class="viable-note" style="background:#fff5f5;border-color:#f3c2c2">
+        <div class="big" style="color:#c62828">0</div>
+        <div>You haven't entered any animals (Batch 1 + Batch 2 = 0). Please go back to the input fields and enter the number of animals to generate the project summary.</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="mbtn ghost" data-close>Close</button>
+      <button class="mbtn primary" id="zmGo">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Go to Input Fields
+      </button>
+    </div>
+  </div>`;
+document.body.appendChild(zeroModal);
+zeroModal.querySelector('#zmGo').addEventListener('click',()=>{ window.location.href='form.html'; });
+
+const openModal  = m => m.classList.add('show');
+const closeModal = m => m.classList.remove('show');
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',e=>closeModal(e.target.closest('.modal-bg'))));
+[previewModal,viableModal,zeroModal].forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) closeModal(m); }));
+
+let saving=false;
+function doDownload(){
+  if(saving) return; saving=true;
+  closeModal(previewModal); closeModal(viableModal);
+  const el=document.getElementById('out');
+  const fname='Dairy-Project-Report_'+((S('farmerName')||'farm').replace(/[^\w]+/g,'_'))+'.pdf';
+  document.body.classList.add('exporting');
+  const done=()=>{ document.body.classList.remove('exporting'); saving=false; };
+  if(window.html2pdf){
+    html2pdf().set({
+      margin:0,
+      filename:fname,
+      image:{type:'jpeg',quality:0.98},
+      html2canvas:{scale:2,backgroundColor:'#ffffff',useCORS:true,windowWidth:794},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+      pagebreak:{mode:['css','legacy']}
+    }).from(el).save().then(done).catch(done);
+  } else {
+    // PDF library not available — never fall back to the print dialog
+    done();
+    alert('Could not prepare the PDF. Please make sure "html2pdf.bundle.min.js" is in the same folder as this page, then try again.');
+  }
+}
+function requestDownload(){
+  closeModal(previewModal);
+  if(dscrViable) openModal(viableModal);   // show viable notification first (DSCR ≥ 2)
+  else doDownload();
+}
+document.getElementById('previewBtn').addEventListener('click',()=> openModal(ZERO ? zeroModal : previewModal));
+document.getElementById('downloadBtn').addEventListener('click',()=> ZERO ? openModal(zeroModal) : requestDownload());
+document.getElementById('pmDownload').addEventListener('click',requestDownload);
+document.getElementById('vmDownload').addEventListener('click',doDownload);
+
+// ════════════════════ USER DATA TRACKING → Google Sheet ════════════════════
+// Paste your deployed Google Apps Script Web App URL between the quotes below.
+// (Setup steps are in SHEET-SETUP.md). Leave blank to disable tracking.
+const TRACK_URL = "https://script.google.com/macros/s/AKfycbxIQVraHWfJ7nmahwKFGN8EPxmvcqRPp5qFFFLpGwxTACt9znlRwgaIaLdYoexVZVTX/exec";
+
+(function trackGeneration(){
+  if(!TRACK_URL) return;
+  try{
+    // send only once per generation (avoid double-count on report refresh)
+    if(D.genToken && sessionStorage.getItem('trackSent')===D.genToken) return;
+    const payload = {
+      name: S('farmerName'),
+      mobile: S('mobile'),
+      email: S('email'),
+      date: D.dateStr || '',
+      time: D.timeStr || new Date().toLocaleTimeString('en-IN'),
+      animalType: S('C7'),
+      breed: S('C8'),
+      numAnimals: P('C9'),
+      projectCost: Math.round(totalProject),
+      loan: Math.round(loanAmt),
+      npv: Math.round(npv),
+      bcr: +bcr.toFixed(2),
+      irr: +irr.toFixed(2),
+      dscr: +avgDscr.toFixed(2),
+      details: JSON.stringify(D)          // full set of parameters the user entered
+    };
+    // Data goes in the query string of a GET (Apps Script doGet reads ?payload=...).
+    const url = TRACK_URL + (TRACK_URL.indexOf('?')>=0 ? '&' : '?') +
+                'payload=' + encodeURIComponent(JSON.stringify(payload));
+
+    // Fire-and-forget — but it MUST survive long enough to reach the server.
+    // A bare `new Image()` can be garbage-collected (request cancelled) before it lands,
+    // so prefer fetch+keepalive, and if we fall back to Image keep a global reference.
+    let sent = false;
+    if (window.fetch) {
+      try {
+        fetch(url, { method:'GET', mode:'no-cors', keepalive:true, cache:'no-store' }).catch(()=>{});
+        sent = true;
+      } catch(e){}
+    }
+    if (!sent) {
+      window.__beacons = window.__beacons || [];
+      const img = new Image();
+      window.__beacons.push(img);          // retained → not GC-cancelled
+      img.referrerPolicy = 'no-referrer';
+      img.src = url;
+    }
+    if(D.genToken) sessionStorage.setItem('trackSent', D.genToken);
+  }catch(e){ /* tracking must never block the report */ }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ' *)",
+      "Bash(node -e ' *)",
+      "Bash(curl -sL -m 30 \"https://script.google.com/macros/s/AKfycbyi4dpqSiPwleU793hKjeQ27IGxYTmRveDgnp_z_qwJr9bOHSY6wDp9vIRiaRClMgPpcg/exec?callback=test123\" -w \"\\\\n[HTTP %{http_code}] [type %{content_type}]\\\\n\")",
+      "Bash(curl -sL -m 30 \"https://script.google.com/macros/s/AKfycbzejLCqK0B-13eZh-wBATz048l6v0vBpppU6wdVBquB8jqp8bwAVO82petP_tnGWB_m/exec?callback=test123\" -w \"\\\\n[HTTP %{http_code}]\\\\n\")",
+      "Bash(curl -sL -m 30 \"https://script.google.com/macros/s/AKfycbxIQVraHWfJ7nmahwKFGN8EPxmvcqRPp5qFFFLpGwxTACt9znlRwgaIaLdYoexVZVTX/exec?callback=t\" -w \"\\\\n[HTTP %{http_code}]\\\\n\")"
+    ]
+  }
+}

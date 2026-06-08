@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bankable Dairy Farming Project Report | VC&amp;RI Namakkal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gd:#14532d;--gm:#1B5E20;--gl:#2E7D32;--gp:#E8F5E9;--gold:#F9A825;--ink:#10241a;--muted:#5b6f63;--line:#cfe3d2;--cream:#f6faf4}
+a{text-decoration:none;color:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{font-family:'Inter',sans-serif;color:var(--ink);background:var(--cream);line-height:1.55;margin:0}
+
+/* STICKY HEADER — flush with the hero (no gap) and stays on top while scrolling */
+.app-header{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  padding:10px 5vw;background:var(--gd);border-bottom:3px solid var(--gold);box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .logos{display:flex;gap:8px}
+.brand .logos img{width:40px;height:40px;border-radius:50%;background:#fff;padding:3px;object-fit:contain;border:2px solid var(--gold)}
+.brand-txt b{display:block;font-size:14px;font-weight:800;color:#fff;line-height:1.15}
+.brand-txt span{font-size:11px;color:rgba(255,255,255,.72)}
+.app-header nav{display:flex;gap:24px;align-items:center}
+.app-header nav a{font-size:13.5px;font-weight:600;color:rgba(255,255,255,.82);transition:color .2s}
+.app-header nav a:hover{color:#fff}
+.btn-top{background:var(--gold)!important;color:#3a2c00!important;padding:9px 18px;border-radius:8px;font-size:13px!important;font-weight:700}
+.btn-top:hover{background:#ffba2e!important}
+@media(max-width:780px){.app-header nav a:not(.btn-top){display:none}.brand-txt{display:none}}
+
+/* HERO (cow image · text left · professor card bottom-right) */
+.hero{position:relative;min-height:calc(100vh - 67px);display:flex;align-items:center;
+  padding:46px 6vw;color:#fff;overflow:hidden;
+  background:linear-gradient(100deg,rgba(7,28,15,.9) 0%,rgba(7,28,15,.6) 42%,rgba(7,28,15,.22) 72%,rgba(7,28,15,.05) 100%),
+             url('Gemini_Generated_Image_yxhbasyxhbasyxhb.png');
+  background-size:cover;background-position:center right;background-repeat:no-repeat}
+.hero-left{position:relative;z-index:2;max-width:620px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(249,168,37,.16);border:1px solid rgba(249,168,37,.55);
+  color:var(--gold);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;border-radius:30px;margin-bottom:20px}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(249,168,37,.25)}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(32px,4.6vw,56px);line-height:1.06;font-weight:800;margin-bottom:18px;letter-spacing:-.5px;text-shadow:0 2px 18px rgba(0,0,0,.45)}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero .inst{font-size:13px;font-weight:700;color:rgba(255,255,255,.8);line-height:1.5;margin-bottom:18px;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.hero .inst b{display:block;color:#fff;font-size:14.5px}
+.hero p.lead{font-size:16px;color:rgba(255,255,255,.86);max-width:530px;margin:0 0 28px;text-shadow:0 1px 10px rgba(0,0,0,.5)}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:15px;padding:14px 26px;border-radius:11px;cursor:pointer;border:none;transition:transform .15s,background .2s;font-family:inherit}
+.btn-primary{background:var(--gold);color:#3a2c00;box-shadow:0 10px 28px rgba(249,168,37,.35)}
+.btn-primary:hover{transform:translateY(-2px);background:#ffba2e}
+.btn-ghost{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3)}
+.btn-ghost:hover{background:rgba(255,255,255,.2)}
+.prof-card{position:absolute;right:6vw;bottom:30px;z-index:3;max-width:270px;
+  background:rgba(7,28,15,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);
+  border-radius:14px;padding:16px 18px;color:#fff;box-shadow:0 18px 44px rgba(0,0,0,.45)}
+.prof-card .pc-label{font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold)}
+.prof-card b{display:block;font-family:'Playfair Display',serif;font-size:19px;margin:5px 0;line-height:1.15}
+.prof-card .pc-role{font-size:12px;color:rgba(255,255,255,.85);line-height:1.55}
+@media(max-width:880px){.hero{flex-direction:column;align-items:flex-start;justify-content:center;gap:24px}.prof-card{position:static;max-width:100%}}
+
+/* STRIP */
+.strip{background:var(--gm);color:#fff;padding:14px 6vw;display:flex;justify-content:center;gap:36px;flex-wrap:wrap;font-size:13px;font-weight:600}
+.strip span{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.9)}
+.strip .gold{color:var(--gold)}
+
+/* SECTIONS */
+section.block{padding:74px 6vw;max-width:1180px;margin:0 auto}
+.sec-head{text-align:center;max-width:680px;margin:0 auto 48px}
+.sec-head .kicker{font-size:12.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gl);margin-bottom:12px}
+.sec-head h2{font-family:'Playfair Display',serif;font-size:clamp(26px,3vw,38px);font-weight:800;color:var(--gd);line-height:1.12;margin-bottom:14px}
+.sec-head p{font-size:16px;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:s}
+.step{position:relative;background:var(--cream);border:1px solid var(--line);border-radius:14px;padding:26px 20px}
+.step::before{counter-increment:s;content:"0" counter(s);font-family:'Playfair Display',serif;font-size:34px;font-weight:800;color:var(--gold);display:block;margin-bottom:10px}
+.step h4{font-size:15.5px;font-weight:700;color:var(--gd);margin-bottom:6px}
+.step p{font-size:13.5px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px 24px;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(20,83,45,.12)}
+.card .ic{width:50px;height:50px;border-radius:13px;display:grid;place-items:center;background:var(--gp);color:var(--gm);margin-bottom:16px}
+.card h3{font-size:17px;font-weight:700;color:var(--gd);margin-bottom:8px}
+.card p{font-size:14px;color:var(--muted)}
+.cta{background:#fff;border:1px solid var(--line);border-radius:22px;padding:50px 40px;text-align:center;box-shadow:0 20px 50px rgba(20,83,45,.08)}
+.cta h2{font-family:'Playfair Display',serif;font-size:clamp(26px,3vw,36px);color:var(--gd);font-weight:800;margin-bottom:14px}
+.cta p{font-size:16px;color:var(--muted);max-width:520px;margin:0 auto 28px}
+@media(max-width:880px){.steps,.cards{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.steps,.cards{grid-template-columns:1fr}section.block{padding:54px 6vw}}
+
+/* FOOTER (end of page) */
+footer.site-foot{background:var(--gd);color:rgba(255,255,255,.75);padding:30px 5vw;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:12.5px}
+footer.site-foot b{color:var(--gold)}
+footer.site-foot .l{font-weight:600;color:rgba(255,255,255,.85)}
+@media(max-width:600px){footer.site-foot{justify-content:center;text-align:center}}
+/* phones */
+@media(max-width:480px){
+  .app-header{padding:9px 16px}
+  .brand .logos img{width:36px;height:36px}
+  .btn-top{padding:8px 13px;font-size:12.5px!important}
+  .hero{padding:32px 6vw}
+  .hero h1{font-size:30px}
+  .strip{gap:12px 22px;font-size:12px;padding:12px 6vw}
+  .btn{padding:13px 22px;font-size:14px}
+  .prof-card{padding:14px 16px}
+  section.block{padding:46px 6vw}
+}
+</style>
+</head>
+<body>
+
+<!-- STICKY HEADER -->
+<header class="app-header">
+  <a class="brand" href="index.html">
+    <div class="logos">
+      <img src="tanuvas-logo.png" alt="TANUVAS">
+      <img src="vcri-logo.jpg" alt="VC&amp;RI Namakkal">
+    </div>
+    <div class="brand-txt">
+      <b>VC&amp;RI, Namakkal</b>
+      <span>Dept. of Animal Husbandry Economics</span>
+    </div>
+  </a>
+  <nav>
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#about">About</a>
+    <a class="btn-top" href="form.html">Generate Report →</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <span class="eyebrow"><span class="dot"></span>Tamil Nadu Veterinary &amp; Animal Sciences University</span>
+    <h1>Project Report on<br><em>Dairy Farming</em></h1>
+    <div class="inst">
+      <b>Veterinary College &amp; Research Institute, Namakkal</b>
+      Department of Animal Husbandry Economics
+    </div>
+    <p class="lead">A bankable livestock project report tool — enter your farm parameters and instantly generate a complete, bank-ready dairy project report with NPV, BCR, IRR and DSCR.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="form.html">
+        Start Your Report
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="btn btn-ghost" href="#how">See how it works</a>
+    </div>
+  </div>
+  <aside class="prof-card">
+    <span class="pc-label">Project Mentor</span>
+    <b>Dr. V. Senthilkumar</b>
+    <span class="pc-role">Professor &amp; Head,<br>Department of Animal Husbandry Economics<br>VC&amp;RI, Namakkal</span>
+  </aside>
+</section>
+
+<!-- STRIP -->
+<div class="strip">
+  <span><span class="gold">●</span> NABARD-aligned format</span>
+  <span><span class="gold">●</span> Auto EMI &amp; repayment schedule</span>
+  <span><span class="gold">●</span> Declining-balance depreciation</span>
+  <span><span class="gold">●</span> Print-ready PDF</span>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="block" id="how">
+  <div class="sec-head">
+    <div class="kicker">Simple Workflow</div>
+    <h2>From farm details to a bank-ready report in four steps</h2>
+    <p>No spreadsheets, no manual maths. Fill the form section by section — the financial statements build themselves.</p>
+  </div>
+  <div class="steps">
+    <div class="step"><h4>Enter Your Details</h4><p>Name, contact, farm location and financing bank for the report cover.</p></div>
+    <div class="step"><h4>Set Parameters</h4><p>Animals, sheds, equipment, feed, labour and returns — guided, section by section.</p></div>
+    <div class="step"><h4>Auto-Calculate</h4><p>Investment, production, cash flow, repayment &amp; depreciation compute instantly.</p></div>
+    <div class="step"><h4>Get the Report</h4><p>A complete, print-ready bankable project report with all viability ratios.</p></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="block" id="features" style="padding-top:10px">
+  <div class="sec-head">
+    <div class="kicker">What you get</div>
+    <h2>Everything a bank needs, calculated for you</h2>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <div class="ic"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg></div>
+      <h3>Investment &amp; Financing</h3>
+      <p>Capital cost, working capital, bank loan, margin money and subsidy — itemised and totalled automatically.</p>
+    </div>
+    <div class="card">
+      <div class="ic"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+      <h3>7-Year Projections</h3>
+      <p>Year-wise production, income, expenditure and cash flow, including staggered batch milk yields.</p>
+    </div>
+    <div class="card">
+      <div class="ic"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 4h16v4H4zM4 12h10v8H4zM18 12h2v8h-2z"/></svg></div>
+      <h3>Repayment Schedule</h3>
+      <p>Monthly EMI with moratorium period and a full 84-month amortisation table.</p>
+    </div>
+    <div class="card">
+      <div class="ic"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"/></svg></div>
+      <h3>Viability Ratios</h3>
+      <p>Net Present Value, Benefit–Cost Ratio, Internal Rate of Return and Debt Service Coverage Ratio.</p>
+    </div>
+    <div class="card">
+      <div class="ic"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7L9 18l-5-5"/></svg></div>
+      <h3>Depreciation</h3>
+      <p>Declining-balance depreciation on buildings (10%) and equipment (15%), carried across all years.</p>
+    </div>
+    <div class="card">
+      <div class="ic"><svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6zM15 2v5h5M9 13h6M9 17h6"/></svg></div>
+      <h3>Print-Ready PDF</h3>
+      <p>A clean, professionally formatted document you can save and submit to your bank.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="block" id="about">
+  <div class="sec-head">
+    <div class="kicker">About the project</div>
+    <h2>Developed at VC&amp;RI, Namakkal</h2>
+    <p>A specialised software tool to assist veterinary professionals and entrepreneurs in preparing bankable livestock and poultry farming project reports — built under the guidance of the Department of Animal Husbandry Economics.</p>
+  </div>
+  <div class="cta">
+    <h2>Ready to generate your project report?</h2>
+    <p>It takes about ten minutes. Your data stays in your browser — nothing is uploaded.</p>
+    <a class="btn btn-primary" href="form.html" style="margin:0 auto">
+      Generate My Report
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-foot">
+  <span class="l">Veterinary College &amp; Research Institute, Namakkal · Dept. of Animal Husbandry Economics</span>
+  <span>Developed by <b>Dharshid Vinesh</b> &amp; <b>Dharshika K</b> · © <span id="yr"></span> TANUVAS</span>
+</footer>
+
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+</body>
+</html>
