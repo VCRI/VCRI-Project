@@ -163,6 +163,50 @@ body.exporting .rpage-inner{padding:13mm 14mm}
   .cover h1{font-size:23px}
   .sec-title{font-size:12px;padding:8px 12px}
 }
+/* ════ Save-PDF dropdown ════ */
+.dl-wrap{position:relative}
+.dl-caret{margin-left:3px}
+.dl-menu{position:absolute;right:0;top:calc(100% + 7px);background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 14px 38px rgba(0,0,0,.20);min-width:236px;padding:6px;display:none;z-index:80}
+.dl-menu.show{display:block}
+.dl-menu button{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;background:none;border:none;border-radius:9px;padding:10px 11px;cursor:pointer}
+.dl-menu button:hover{background:var(--cream)}
+.dl-menu button .di{flex:none;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff}
+.dl-menu .di.m{background:#1B5E20}.dl-menu .di.c{background:#caa12b}
+.dl-menu button b{display:block;font-size:13.5px;color:#1d3b25}
+.dl-menu button span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
+/* ════ Chart report — single-sheet infographic + preview overlay ════ */
+.cpv{position:fixed;inset:0;background:rgba(10,20,12,.82);z-index:200;display:none;flex-direction:column}
+.cpv.show{display:flex}
+.cpv-bar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 18px;background:#0f3d22;color:#fff;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.cpv-bar b{font-size:14px}
+.cpv-bar .sub{font-size:11.5px;color:#a9c6ae;margin-left:8px}
+.cpv-bar .acts{display:flex;gap:9px}
+.cpv-bar button{display:flex;align-items:center;gap:7px;border:none;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer}
+.cpv-bar .dl{background:#f0b429;color:#1c1403}.cpv-bar .dl:hover{background:#f6c34e}
+.cpv-bar .cl{background:rgba(255,255,255,.14);color:#fff}.cpv-bar .cl:hover{background:rgba(255,255,255,.24)}
+.cpv-stage{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:22px}
+.cpv-stage #chartOut{transform-origin:top center}
+@media(max-width:600px){.cpv-bar{flex-wrap:wrap}.cpv-bar .sub{display:none}}
+/* the printable document — two A4-portrait pages (1000×1414), 2×2 panels each */
+#cdoc{display:block}
+.pglab{color:#e7d49a;font-family:'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center;margin:0 0 9px}
+.csheet+.pglab{margin-top:30px}
+.csheet{width:1000px;height:1414px;box-sizing:border-box;padding:28px;background:#14532d;background-image:radial-gradient(circle at 22% -5%,#1d6b44,#0f3d22 72%);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:20px;font-family:'Segoe UI',Arial,sans-serif;color:#1d3b25;page-break-after:always}
+.csheet:last-child{page-break-after:avoid}
+.csheet .cp{background:#faf6ea;border-radius:14px;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 3px 10px rgba(0,0,0,.22)}
+.csheet .cp-h{flex:none;display:flex;align-items:center;gap:10px;padding:10px 18px 8px;border-bottom:1px solid #e7dfca}
+.csheet .cp-n{background:#14532d;color:#f0b429;font-weight:800;font-size:13px;border-radius:6px;padding:3px 8px;font-family:Arial}
+.csheet .cp-t{font-size:14px;font-weight:800;letter-spacing:.5px;color:#14532d;text-transform:uppercase}
+.csheet .cp-b{flex:1;padding:13px 18px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-evenly}
+.csheet .cp-f{flex:none;font-size:8px;letter-spacing:.5px;color:#9a9377;text-align:center;padding:5px;border-top:1px solid #efe8d5;text-transform:uppercase}
+.csheet .cp.cover{background:linear-gradient(150deg,#16572f,#0b3a1e);color:#f3ecd6;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+.csheet .cp.cover .cp-b{padding:0;display:block}
+.csheet .sub-t{font-size:11px;font-weight:800;letter-spacing:.6px;color:#9a7a1e;text-transform:uppercase;margin:0 0 5px}
+.csheet table.emi{width:100%;border-collapse:collapse;font-size:9.5px;color:#1d3b25}
+.csheet table.emi th{background:#14532d;color:#f3ecd6;font-weight:700;padding:4px 7px;text-align:right}
+.csheet table.emi th:first-child{text-align:left}
+.csheet table.emi td{padding:3px 7px;text-align:right;border-bottom:1px solid #ece4cf}
+.csheet table.emi td:first-child{text-align:left;font-weight:700}
 </style>
 </head>
 <body>
@@ -180,10 +224,18 @@ body.exporting .rpage-inner{padding:13mm 14mm}
         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         Preview Summary
       </button>
-      <button class="nav-btn" id="downloadBtn">
-        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2zM17 21v-8H7v8M7 3v5h8"/></svg>
-        Save PDF
-      </button>
+      <div class="dl-wrap">
+        <button class="nav-btn" id="dlToggle">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2zM17 21v-8H7v8M7 3v5h8"/></svg>
+          Save PDF
+          <svg class="dl-caret" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="dl-menu" id="dlMenu">
+          <button id="dlMetrics"><span class="di m"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2"><path d="M9 17v-6M12 17v-3M15 17v-9M4 4h16v16H4z"/></svg></span><span><b>Metrics PDF</b><span>Detailed tables &amp; statements</span></span></button>
+          <button id="dlChart"><span class="di c"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2"><path d="M3 3v18h18M7 14l3-3 3 3 5-6"/></svg></span><span><b>Chart PDF</b><span>2-page visual dashboard</span></span></button>
+        </div>
+      </div>
+      <button id="downloadBtn" style="display:none"></button>
     </div>
   </div>
 </header>
@@ -192,6 +244,18 @@ body.exporting .rpage-inner{padding:13mm 14mm}
 <main class="app-main">
   <div class="report-container" id="out"></div>
 </main>
+
+<!-- ░░ CHART REPORT PREVIEW OVERLAY ░░ -->
+<div class="cpv" id="chartPreview">
+  <div class="cpv-bar">
+    <div><b>Chart Report</b><span class="sub">single-sheet visual summary · preview before download</span></div>
+    <div class="acts">
+      <button class="dl" id="cpvDl"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2zM17 21v-8H7v8M7 3v5h8"/></svg>Download PDF</button>
+      <button class="cl" id="cpvClose"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>Close</button>
+    </div>
+  </div>
+  <div class="cpv-stage"><div id="chartOut"></div></div>
+</div>
 
 <script src="html2pdf.bundle.min.js"></script>
 <script>
@@ -208,6 +272,12 @@ const F2  = n => (Math.round(n*100)/100).toLocaleString('en-IN',{minimumFraction
 const roundDown2 = x => Math.floor(x/100)*100;
 function pmt(rate,nper,pv){ if(!nper) return 0; if(rate===0) return pv/nper; return pv*rate*Math.pow(1+rate,nper)/(Math.pow(1+rate,nper)-1); }
 const ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV'];
+
+// ════════════════════ SPECIES ROUTER ════════════════════
+const SPECIES_PICK = D.species || 'Cow';
+if(SPECIES_PICK==='Goat'){ renderGoat(); }
+else if(SPECIES_PICK==='Hen'){ renderHen(); }
+else {   // ───── COW / DAIRY (unchanged) ─────
 
 // ════════════════════ CALC ENGINE (faithful to Excel) ════════════════════
 const NY = Math.max(1, Math.round(P('C54')));      // projection years = repayment period
@@ -746,6 +816,813 @@ const TRACK_URL = "https://script.google.com/macros/s/AKfycbxIQVraHWfJ7nmahwKFGN
     }
     if(D.genToken) sessionStorage.setItem('trackSent', D.genToken);
   }catch(e){ /* tracking must never block the report */ }
+})();
+
+// ── chart-report data (read-only capture — no calculation changed) ──
+window.__CHART = {
+  species:'Cow', title:'Dairy Farming', farmer:S('farmerName')||'—', mobile:S('mobile'),
+  breed:S('C8')||'Dairy Cow', dateStr:D.dateStr||'', unitText:NUM(P('C9'))+' '+(S('C7')||'Cows'),
+  NY:NY, yearLabels:Array.from({length:NY},(_,y)=>ROMAN[y]),
+  npv:npv, bcr:bcr, irr:irr, avgDscr:avgDscr, dscr:dscr.slice(), interest:P('C53'),
+  projectCost:totalProject, loan:loanAmt, margin:marginAmt, subsidy:subsidyAmt, emi:emi,
+  capital:totalCapital, workingCapital:totalWC,
+  income:totalIncome.slice(), expenditure:totalExp.slice(), net:netIncome.slice(),
+  loanBalance:(function(){let o=loanAmt;const a=[o];for(let y=0;y<NY;y++){o-=yrPrin[y];a.push(Math.max(0,o));}return a;})(),
+  yrInt:yrInt.slice(), yrPrin:yrPrin.slice(),
+  factUnitLabel:'Milch Cattle', factUnitValue:NUM(P('C9')),
+  factOutputLabel:'Milk / year', factOutputValue:NUM(milkQty[NY>1?1:0])+' L',
+  incomeBreak:[['Milk',milkInc[NY>1?1:0]],['Calves',maleCalf+femaleCalf],['Manure',manure],['Other',P('C100')+P('C101')]],
+  costBreak:[['Feed',concentrate[NY>1?1:0]+dryFodderAnnual+greenFodder[NY>1?1:0]],['Labour',labourAnnual],['Interest',yrInt[NY>1?1:0]],['Depreciation',depB[NY>1?1:0]+depE[NY>1?1:0]],['Vet & Others',vetAnnual+miscAnnual+insurance+elecAnnual+fuelAnnual+unitExp]],
+  investBreak:[['Livestock',animalCost],['Sheds & Civil',animalShed+calfPen+storeRoom+labourQ+P('C43')*P('C44')+P('C45')*P('C46')],['Equipment',feeder+P('C25')+P('C26')+P('C27')+P('C28')+P('C29')+P('C30')+P('C31')+P('C32')],['Infra & Vehicles',P('C39')+P('C40')+P('C41')+P('C42')+P('C47')+P('C48')+P('C49')+P('C33')+P('C34')+(P('C58')*P('C59'))+(P('C60')*P('C61'))]],
+  financeBreak:[['Bank Loan',loanAmt],['Margin Money',marginAmt]],
+  viable:viable, zero:ZERO
+};
+
+}   // ═══════ end COW / DAIRY branch ═══════
+
+// ════════════════════════════════════════════════════════════════════
+//  GOAT ENGINE + REPORT  (faithful to "goat final sheet")
+// ════════════════════════════════════════════════════════════════════
+function renderGoat(){
+  const out=document.getElementById('out');
+  const NY=Math.max(1,Math.round(P('gRepay')));
+  const bucks=P('gBucks'), does=P('gDoes'), tot=bucks+does;
+  // ── Investment ──
+  const buckCost=bucks*P('gCostMale');
+  const doeCost=roundDown2(does*P('gCostFemale'));
+  const adultShed=(bucks*P('gSpaceBuck')*P('gShedRate'))+(does*P('gSpaceDoe')*P('gShedRate'));
+  const kidPen=does*P('gSpaceKid')*P('gShedRate');
+  const storeRoom=P('gStoreArea')*P('gStoreRate');
+  const labourQ=P('gLqArea')*P('gLqRate');
+  const adultEquip=tot*P('gEquipAdult');
+  const kidEquip=does*P('gEquipKid');
+  const chaff=P('gChaffNos')*P('gChaffCost');
+  const cap=[
+    ['Cost of Bucks',buckCost],['Cost of Does',doeCost],
+    ['Construction — Adult Shed',adultShed],['Construction — Kid Pen',kidPen],
+    ['Construction — Store Room',storeRoom],['Construction — Labour Quarters',labourQ],
+    ['Equipment — Adult Animals',adultEquip],['Equipment — Kids',kidEquip],['Chaff Cutter',chaff],
+    ['Brush Cutter',P('gBrush')],['Mini Feed Machinery',P('gFeedMachine')],['Motor for Irrigation',P('gMotor')],
+    ['Sprinkler & Fogger',P('gSprinkler')],['Overhead Tank',P('gTank')],['Fencing for Goat Shed',P('gFencing')],
+    ['Land Levelling',P('gLandLevel')],['Borewell',P('gBorewell')],
+    ['Vehicle',(P('gTwoW')*P('gTwoWCost'))+(P('gFourW')*P('gFourWCost'))],
+    ['Computers',P('gComputers')],['CCTV',P('gCCTV')]
+  ];
+  const totalCapital=roundDown2(cap.reduce((a,[,v])=>a+v,0));
+  const insurance=(buckCost+doeCost)*P('gInsurance')/100;
+  const transport=tot*P('gTransport');
+  const concentrate=((bucks*P('gConcBuck'))+(does*P('gConcDoe'))+(does*4*P('gConcKid')))*P('gConcCost')*365;
+  const dryFodder=P('gDryFodder');
+  const greenY1=P('gGreenArea')*P('gGreenY1');
+  const labour=((P('gWorkers')*P('gWage'))+(P('gManagers')*P('gMgrSal'))+(P('gDrivers')*P('gDrvSal'))+(P('gOffice')*P('gOffSal')))*12;
+  const vet=(tot*P('gVetAdult'))+(does*4*P('gVetKid'));
+  const electricity=P('gElectricity')*12;
+  const fuel=P('gFuel')*12;
+  const misc=P('gMisc')*tot;
+  const feedUnit=P('gFeedUnit');
+  const wc=[
+    ['Insurance Premium',insurance],['Transport Charges',transport],['Concentrate Feed',concentrate],
+    ['Dry Fodder',dryFodder],['Green Fodder',greenY1],['Labour Wages',labour],['Veterinary Expenses',vet],
+    ['Electricity',electricity],['Fuel',fuel],['Miscellaneous',misc],['Feed Making Unit',feedUnit]
+  ];
+  const totalWC=roundDown2(wc.reduce((a,[,v])=>a+v,0));
+  const totalProject=roundDown2(totalCapital+totalWC);
+  const margin=totalProject*P('gMargin')/100, loan=totalProject-margin, subsidy=totalProject*P('gSubsidy')/100;
+  // ── Repayment (PMT, 3-month moratorium) ──
+  const months=NY*12, mRate=P('gInterest')/100/12, emi=pmt(mRate,months,loan), MORA=3;
+  let bal=loan; const monthly=[];
+  for(let m=1;m<=months;m++){ let intr=bal*mRate,prin,pay; if(m<=MORA){prin=0;pay=intr;} else {prin=emi-intr;pay=emi;bal-=prin; if(bal<-0.01){prin+=bal;pay+=bal;bal=0;} else if(bal<0)bal=0;} monthly.push({m,pay,prin,intr,bal:Math.max(0,bal)}); }
+  const yrInt=[],yrPrin=[]; for(let y=0;y<NY;y++){let si=0,sp=0;for(let mo=y*12;mo<(y+1)*12;mo++){si+=monthly[mo].intr;sp+=monthly[mo].prin;}yrInt.push(si);yrPrin.push(sp);}
+  // ── Depreciation ──
+  const bldgBase=adultShed+kidPen+storeRoom+labourQ;
+  const equipBase=adultEquip+kidEquip+chaff+P('gBrush')+P('gFeedMachine')+P('gMotor')+P('gSprinkler');
+  const depB=[],depE=[],depTable=[]; let bb=bldgBase,eb=equipBase;
+  for(let y=0;y<NY;y++){const a=bb*P('gDepBuilding')/100,b=eb*P('gDepEquip')/100; depTable.push({y:y+1,bBeg:bb,bDep:a,bEnd:bb-a,eBeg:eb,eDep:b,eEnd:eb-b}); depB.push(a);depE.push(b);bb-=a;eb-=b;}
+  const totalDep=depB.map((b,y)=>b+depE[y]);
+  // ── Production (kids) ──
+  const bornMale=does*P('gKiddings')*P('gLitter')/2, bornFemale=bornMale;
+  const mortM=Math.round(bornMale*P('gKidMortality')/100), mortF=Math.round(bornFemale*P('gKidMortality')/100);
+  const saleMale=Math.max(0,bornMale-mortM-P('gReplMale')), saleFemale=Math.max(0,bornFemale-mortF-P('gReplFemale'));
+  const culled=P('gCulledMale')+P('gCulledFemale');
+  // ── Income (flat all years) ──
+  const incMale=saleMale*P('gPriceMale'), incFemale=saleFemale*P('gPriceFemale'), incManure=P('gManure')*tot, incCulled=P('gCulledPrice')*culled;
+  const totalIncome=incMale+incFemale+incManure+incCulled;
+  // ── Expenditure per year ──
+  const opFlat=insurance+concentrate+dryFodder+greenY1+labour+vet+electricity+fuel+misc+feedUnit;
+  const totalExp=Array.from({length:NY},(_,y)=> opFlat + (y===0?transport:0) + yrInt[y] + depB[y] + depE[y]);
+  const netIncome=totalExp.map(e=>totalIncome-e);
+  // ── Financial Analysis (Year-6 fix applied, consistent with dairy) ──
+  const r=P('gInterest')/100; const df=[],pwExp=[],pwBen=[];
+  for(let y=0;y<NY;y++){const f=1/Math.pow(1+r,y+1);df.push(f);pwExp.push(totalExp[y]*f);pwBen.push(totalIncome*f);}
+  const sumPWexp=pwExp.reduce((a,b)=>a+b,0), sumPWben=pwBen.reduce((a,b)=>a+b,0);
+  const npv=sumPWben-sumPWexp, bcr=sumPWexp?sumPWben/sumPWexp:0;
+  const rH=(P('gInterest')+20)/100; const inb=totalExp.map(e=>totalIncome-e);
+  let pvL=0,pvH=0; for(let y=0;y<NY;y++){pvL+=inb[y]/Math.pow(1+r,y+1);pvH+=inb[y]/Math.pow(1+rH,y+1);}
+  const irr=P('gInterest')+20*(pvL/((pvL+pvH)||1));
+  const dscrNum=netIncome.map((n,y)=>n+yrInt[y]+totalDep[y]);
+  const dscrDen=yrPrin.map((p,y)=>p+yrInt[y]);
+  const dscr=dscrNum.map((n,y)=>dscrDen[y]?n/dscrDen[y]:0);
+  const avgDscr=dscrNum.reduce((a,b)=>a+b,0)/(dscrDen.reduce((a,b)=>a+b,0)||1);
+  const ZERO=tot<=0;
+  const dNPV=ZERO?'—':INR(npv), dBCR=ZERO?'—':F2(bcr), dIRR=ZERO?'—':F2(irr)+'%', dDSCR=ZERO?'—':F2(avgDscr);
+
+  // ── render ──
+  const YH=Array.from({length:NY},(_,y)=>ROMAN[y]+' Year');
+  const yhCols=YH.map(h=>`<th class="num">${h}</th>`).join('');
+  let pageNo=0;
+  const pgHeader=()=>`<div class="pg-header"><div><h2>Veterinary College &amp; Research Institute, Namakkal</h2><p>Dept. of Animal Husbandry Economics — Bankable Goat Project Report</p></div><div class="r"><b>${S('farmerName')||'—'}</b>${D.dateStr||''}<br>${S('mobile')?'Ph: '+S('mobile'):''}</div></div>`;
+  const page=(c)=>{pageNo++;return `<div class="rpage"><div class="rpage-inner">${pgHeader()}${c}<div class="pg-num"><span class="c">Guided by Dr. V. Senthilkumar, Prof. &amp; Head, Dept. of AH Economics</span> Page ${pageNo}</div></div></div>`;};
+  const breed=S('gBreed')||'Goat';
+  let html='';
+  // cover
+  html+=`<div class="rpage"><div class="cover">
+    <div class="univ">Tamil Nadu Veterinary &amp; Animal Sciences University</div>
+    <div class="inst">Veterinary College &amp; Research Institute, Namakkal</div>
+    <div class="dept">Department of Animal Husbandry Economics</div>
+    <div class="seal">VC<span style="font-size:11px">RI</span></div>
+    <h1>Project Report on Goat Farming</h1>
+    <div class="subtitle">Bankable Project Report &nbsp;·&nbsp; ${NY}-Year Financial Appraisal</div>
+    <div class="cover-line"></div>
+    <div class="cover-box">
+      <div class="row"><span>Name of the Farmer / Unit</span><b>${S('farmerName')||'—'}</b></div>
+      <div class="row"><span>Breed</span><b>${breed}</b></div>
+      <div class="row"><span>Unit Size</span><b>${NUM(bucks)} Bucks + ${NUM(does)} Does</b></div>
+      <div class="row"><span>Total Project Cost</span><b>${INR(totalProject)}</b></div>
+      <div class="row"><span>Bank Loan</span><b>${INR(loan)}</b></div>
+      <div class="row"><span>Repayment Period</span><b>${NY} Years</b></div>
+      <div class="row"><span>Date of Report</span><b>${D.dateStr||''}</b></div>
+    </div>
+    <div class="cover-foot">Prepared using the VC&amp;RI Livestock Project tool &nbsp;·&nbsp; Guided by <b>Dr. V. Senthilkumar</b></div>
+  </div></div>`;
+  // glance
+  html+=page(`<div class="sec-title">Project at a Glance</div>
+  <table><tr><th style="width:46%">Particulars</th><th>Details</th></tr>
+    <tr><td>1. Name of the Farmer / Unit</td><td>${S('farmerName')||'—'}</td></tr>
+    <tr><td>2. Address of the Farmer</td><td>${S('farmerAddress')||'—'}</td></tr>
+    <tr><td>3. Aadhar Number (optional)</td><td>${S('aadhar')||'—'}</td></tr>
+    <tr><td>4. Mobile Number</td><td>${S('mobile')||'—'}</td></tr>
+    <tr><td>5. E-mail Id (optional)</td><td>${S('email')||'—'}</td></tr>
+    <tr><td>6. Nature of Farming / Activity</td><td>${S('natureFarming')||'Goat Farming'} — ${NUM(bucks)} Bucks + ${NUM(does)} Does (${breed})</td></tr>
+    <tr><td>7. Address / Location of the Farm</td><td>${S('farmLocation')||'—'}</td></tr>
+    <tr><td>8. Name of the Financing Bank</td><td>${S('bankName')||'—'}</td></tr>
+    <tr><td>9. Name of the Branch</td><td>${S('branchName')||'—'}</td></tr>
+  </table>
+  <table><tr><th style="width:46%">Particulars</th><th class="num">Amount (Rs.)</th></tr>
+    <tr class="sec-row"><td colspan="2">10 · Project Cost</td></tr>
+    <tr><td>Capital &amp; Machinery Investment</td><td class="num">${INR(totalCapital)}</td></tr>
+    <tr><td>Working Capital</td><td class="num">${INR(totalWC)}</td></tr>
+    <tr class="total"><td>Total Cost of the Project</td><td class="num">${INR(totalProject)}</td></tr>
+    <tr class="sec-row"><td colspan="2">11 · Means of Finance</td></tr>
+    <tr><td>Bank Loan</td><td class="num">${INR(loan)}</td></tr>
+    <tr><td>Margin Money</td><td class="num">${INR(margin)}</td></tr>
+    <tr><td>Subsidy (${F2(P('gSubsidy'))}%)</td><td class="num">${INR(subsidy)}</td></tr>
+    <tr><td>Rate of Interest</td><td class="num">${F2(P('gInterest'))}% p.a.</td></tr>
+    <tr><td>Repayment Period</td><td class="num">${NY} years</td></tr>
+  </table>
+  <table><tr><th style="width:46%">12 · Project Evaluation</th><th class="num">Value</th></tr>
+    <tr><td>Net Present Value (NPV)</td><td class="num">${dNPV}</td></tr>
+    <tr><td>Benefit–Cost Ratio (BCR)</td><td class="num">${dBCR}</td></tr>
+    <tr><td>Internal Rate of Return (IRR)</td><td class="num">${dIRR}</td></tr>
+    <tr><td>Debt Service Coverage Ratio (avg)</td><td class="num">${dDSCR}</td></tr>
+  </table>`);
+  // investment
+  html+=page(`<div class="sec-title">Investment of the Project</div>
+  <table><tr><th>Particulars</th><th class="num">Amount (Rs.)</th></tr>
+    <tr class="sec-row"><td>A — Capital / Fixed Investment</td><td></td></tr>
+    ${cap.filter(([,v])=>v>0).map(([l,v])=>`<tr><td>${l}</td><td class="num">${INR(v)}</td></tr>`).join('')}
+    <tr class="total"><td>Total Capital Investment</td><td class="num">${INR(totalCapital)}</td></tr>
+    <tr class="sec-row"><td>B — Working Capital (one year)</td><td></td></tr>
+    ${wc.filter(([,v])=>v>0).map(([l,v])=>`<tr><td>${l}</td><td class="num">${INR(v)}</td></tr>`).join('')}
+    <tr class="total"><td>Total Working Capital</td><td class="num">${INR(totalWC)}</td></tr>
+    <tr class="total"><td>Total Cost of the Project</td><td class="num">${INR(totalProject)}</td></tr>
+  </table>
+  <div class="sec-title">Means of Finance</div>
+  <table><tr><th>Particulars</th><th class="num">Amount (Rs.)</th></tr>
+    <tr><td>Loan from Bank (${F2(100-P('gMargin'))}%)</td><td class="num">${INR(loan)}</td></tr>
+    <tr><td>Margin Money (${F2(P('gMargin'))}%)</td><td class="num">${INR(margin)}</td></tr>
+    <tr class="total"><td>Total</td><td class="num">${INR(loan+margin)}</td></tr>
+    <tr><td>Subsidy available (${F2(P('gSubsidy'))}%)</td><td class="num">${INR(subsidy)}</td></tr>
+  </table>`);
+  // production
+  html+=page(`<div class="sec-title">Flock / Kid Production (per annum)</div>
+  <table><tr><th>Particulars</th><th class="num">Nos.</th></tr>
+    <tr><td>Does in the unit</td><td class="num">${NUM(does)}</td></tr>
+    <tr><td>Kiddings per doe per year</td><td class="num">${F2(P('gKiddings'))}</td></tr>
+    <tr><td>Average litter size</td><td class="num">${F2(P('gLitter'))}</td></tr>
+    <tr><td>Male kids born</td><td class="num">${NUM(bornMale)}</td></tr>
+    <tr><td>Female kids born</td><td class="num">${NUM(bornFemale)}</td></tr>
+    <tr><td>Kid mortality (${F2(P('gKidMortality'))}%) — male / female</td><td class="num">${NUM(mortM)} / ${NUM(mortF)}</td></tr>
+    <tr><td>Replacement stock kept — male / female</td><td class="num">${NUM(P('gReplMale'))} / ${NUM(P('gReplFemale'))}</td></tr>
+    <tr class="total"><td>Male kids available for sale</td><td class="num">${NUM(saleMale)}</td></tr>
+    <tr class="total"><td>Female kids available for sale</td><td class="num">${NUM(saleFemale)}</td></tr>
+    <tr><td>Adult animals culled</td><td class="num">${NUM(culled)}</td></tr>
+  </table>
+  <p class="note">Male kid @ ${INR(P('gPriceMale'))} · Female kid @ ${INR(P('gPriceFemale'))} · Culled @ ${INR(P('gCulledPrice'))}.</p>`);
+  // expenditure & income
+  const expRows=[
+    ['Insurance Premium', y=>insurance],['Transport Charges', y=>y===0?transport:0],['Concentrate Feed', y=>concentrate],
+    ['Dry Fodder', y=>dryFodder],['Green Fodder', y=>greenY1],['Labour Wages', y=>labour],['Veterinary Expenses', y=>vet],
+    ['Electricity', y=>electricity],['Fuel', y=>fuel],['Miscellaneous', y=>misc],['Feed Making Unit', y=>feedUnit],
+    ['Interest on Loan', y=>yrInt[y]],['Depreciation — Building', y=>depB[y]],['Depreciation — Equipment', y=>depE[y]]
+  ];
+  html+=page(`<div class="sec-title">Expenditure &amp; Income Statement</div>
+  <table><tr><th>Particulars</th>${yhCols}</tr>
+    <tr class="sec-row"><td>Income</td>${YH.map(()=>'<td></td>').join('')}</tr>
+    <tr><td>By Sale of Male Kids</td>${YH.map(()=>`<td class="num">${INR(incMale)}</td>`).join('')}</tr>
+    <tr><td>By Sale of Female Kids</td>${YH.map(()=>`<td class="num">${INR(incFemale)}</td>`).join('')}</tr>
+    <tr><td>By Sale of Culled Animals</td>${YH.map(()=>`<td class="num">${INR(incCulled)}</td>`).join('')}</tr>
+    <tr><td>By Sale of Manure</td>${YH.map(()=>`<td class="num">${INR(incManure)}</td>`).join('')}</tr>
+    <tr class="total"><td>Total Income</td>${YH.map(()=>`<td class="num">${INR(totalIncome)}</td>`).join('')}</tr>
+    <tr class="sec-row"><td>Expenditure</td>${YH.map(()=>'<td></td>').join('')}</tr>
+    ${expRows.map(([l,fn])=>`<tr><td>${l}</td>${Array.from({length:NY},(_,y)=>`<td class="num">${INR(fn(y))}</td>`).join('')}</tr>`).join('')}
+    <tr class="total"><td>Total Expenditure</td>${totalExp.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr class="subtotal"><td>Net Income</td>${netIncome.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+  </table>`);
+  // cash flow
+  html+=page(`<div class="sec-title">Cash Flow Statement</div>
+  <table><tr><th>Particulars</th>${yhCols}</tr>
+    <tr><td>Total Revenue</td>${YH.map(()=>`<td class="num">${INR(totalIncome)}</td>`).join('')}</tr>
+    <tr><td>Total Expenditure</td>${totalExp.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr class="subtotal"><td>Net Revenue</td>${netIncome.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr><td>Add: Interest</td>${yrInt.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr><td>Add: Depreciation</td>${totalDep.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr class="total"><td>Net Cash Accruals (for Debt Service)</td>${dscrNum.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+  </table>`);
+  // repayment annual
+  html+=page(`<div class="sec-title">Loan Repayment — Annual Summary</div>
+  <div class="hl"><div class="b"><label>Loan Amount</label><div class="val">${INR(loan)}</div></div>
+    <div class="b gold"><label>Monthly EMI</label><div class="val">${INR(emi)}</div><p>from Month ${MORA+1}</p></div>
+    <div class="b"><label>Interest Rate</label><div class="val">${F2(P('gInterest'))}%</div><p>${MORA}-month moratorium</p></div></div>
+  <table><tr><th>Year</th><th class="num">Opening Balance</th><th class="num">Principal</th><th class="num">Interest</th><th class="num">Instalment</th><th class="num">Closing Balance</th></tr>
+    ${(()=>{let open=loan,rows='';for(let y=0;y<NY;y++){const close=open-yrPrin[y];rows+=`<tr><td>${YH[y]}</td><td class="num">${INR(open)}</td><td class="num">${INR(yrPrin[y])}</td><td class="num">${INR(yrInt[y])}</td><td class="num">${INR(yrPrin[y]+yrInt[y])}</td><td class="num">${INR(Math.max(0,close))}</td></tr>`;open=close;}return rows;})()}
+  </table>`);
+  // depreciation
+  html+=page(`<div class="sec-title">Depreciation — Declining Balance Method</div>
+  <p class="note">Buildings @ ${F2(P('gDepBuilding'))}% · Equipment @ ${F2(P('gDepEquip'))}% per annum.</p>
+  <table><tr><th rowspan="2">Year</th><th colspan="3" style="text-align:center">Buildings</th><th colspan="3" style="text-align:center">Equipment</th></tr>
+    <tr><th class="num">Beginning</th><th class="num">Depreciation</th><th class="num">End</th><th class="num">Beginning</th><th class="num">Depreciation</th><th class="num">End</th></tr>
+    ${depTable.map(d=>`<tr><td>${ROMAN[d.y-1]}</td><td class="num">${INR(d.bBeg)}</td><td class="num">${INR(d.bDep)}</td><td class="num">${INR(d.bEnd)}</td><td class="num">${INR(d.eBeg)}</td><td class="num">${INR(d.eDep)}</td><td class="num">${INR(d.eEnd)}</td></tr>`).join('')}
+  </table>`);
+  // financial analysis
+  const viable=npv>0&&bcr>1&&irr>P('gInterest')&&avgDscr>1.5;
+  html+=page(`<div class="sec-title">Financial Analysis of the Project</div>
+  <table><tr><th>Year</th><th class="num">Expenditure</th><th class="num">Revenue</th><th class="num">Discount Factor @ ${F2(P('gInterest'))}%</th><th class="num">PW of Cost</th><th class="num">PW of Benefit</th></tr>
+    ${Array.from({length:NY},(_,y)=>`<tr><td>${ROMAN[y]}</td><td class="num">${INR(totalExp[y])}</td><td class="num">${INR(totalIncome)}</td><td class="num">${df[y].toFixed(3)}</td><td class="num">${INR(pwExp[y])}</td><td class="num">${INR(pwBen[y])}</td></tr>`).join('')}
+    <tr class="total"><td>Total</td><td></td><td></td><td></td><td class="num">${INR(sumPWexp)}</td><td class="num">${INR(sumPWben)}</td></tr>
+  </table>
+  <div class="hl">
+    <div class="b ${ZERO?'':(npv>0?'':'red')}"><label>Net Present Value</label><div class="val">${dNPV}</div><p>${ZERO?'No animals':(npv>0?'Positive — viable':'Negative')}</p></div>
+    <div class="b ${ZERO?'':(bcr>1?'':'red')}"><label>Benefit–Cost Ratio</label><div class="val">${dBCR}</div><p>${ZERO?'No animals':(bcr>1?'Above 1':'Below 1')}</p></div>
+    <div class="b gold"><label>Internal Rate of Return</label><div class="val">${dIRR}</div><p>${ZERO?'No animals':'vs '+F2(P('gInterest'))+'% rate'}</p></div>
+  </div>
+  <div class="sec-title" style="margin-top:18px">Debt Service Coverage Ratio</div>
+  <table><tr><th>Year</th><th class="num">Net Cash Accruals</th><th class="num">Debt Obligation</th><th class="num">DSCR</th></tr>
+    ${Array.from({length:NY},(_,y)=>`<tr><td>${ROMAN[y]}</td><td class="num">${INR(dscrNum[y])}</td><td class="num">${INR(dscrDen[y])}</td><td class="num">${ZERO?'—':F2(dscr[y])}</td></tr>`).join('')}
+    <tr class="total"><td>Average DSCR</td><td></td><td></td><td class="num">${dDSCR}</td></tr>
+  </table>
+  <div class="verdict"><b>Verdict:</b> ${ZERO?'No animals entered — enter a herd size to evaluate viability.':(viable?`<span class="ok">The project is financially viable and bankable.</span> NPV positive, BCR over 1, IRR ${F2(irr)}% above the lending rate, average DSCR ${F2(avgDscr)} above the 1.5 norm.`:'Review required — one or more indicators are below the bankable threshold.')}</div>`);
+
+  window.__CHART = {
+    species:'Goat', title:'Goat Farming', farmer:S('farmerName')||'—', mobile:S('mobile'),
+    breed:breed, dateStr:D.dateStr||'', unitText:NUM(bucks)+' Bucks + '+NUM(does)+' Does',
+    NY:NY, yearLabels:Array.from({length:NY},(_,y)=>ROMAN[y]),
+    npv:npv, bcr:bcr, irr:irr, avgDscr:avgDscr, dscr:dscr.slice(), interest:P('gInterest'),
+    projectCost:totalProject, loan:loan, margin:margin, subsidy:subsidy, emi:emi,
+    capital:totalCapital, workingCapital:totalWC,
+    income:Array.from({length:NY},()=>totalIncome), expenditure:totalExp.slice(), net:netIncome.slice(),
+    loanBalance:(function(){let o=loan;const a=[o];for(let y=0;y<NY;y++){o-=yrPrin[y];a.push(Math.max(0,o));}return a;})(),
+    yrInt:yrInt.slice(), yrPrin:yrPrin.slice(),
+    factUnitLabel:'Does + Bucks', factUnitValue:NUM(does)+' + '+NUM(bucks),
+    factOutputLabel:'Kids for sale', factOutputValue:NUM(saleMale+saleFemale),
+    incomeBreak:[['Male Kids',incMale],['Female Kids',incFemale],['Culled',incCulled],['Manure',incManure]],
+    costBreak:[['Feed',concentrate+dryFodder+greenY1],['Labour',labour],['Interest',yrInt[NY>1?1:0]],['Depreciation',depB[NY>1?1:0]+depE[NY>1?1:0]],['Vet & Others',vet+misc+insurance+electricity+fuel+feedUnit]],
+    investBreak:[['Livestock',buckCost+doeCost],['Sheds & Civil',adultShed+kidPen+storeRoom+labourQ],['Equipment',adultEquip+kidEquip+chaff+P('gBrush')+P('gFeedMachine')+P('gMotor')+P('gSprinkler')],['Infra & Vehicles',P('gTank')+P('gFencing')+P('gLandLevel')+P('gBorewell')+(P('gTwoW')*P('gTwoWCost'))+(P('gFourW')*P('gFourWCost'))+P('gComputers')+P('gCCTV')]],
+    financeBreak:[['Bank Loan',loan],['Margin Money',margin]],
+    viable:viable, zero:ZERO
+  };
+  out.innerHTML=html;
+  attachReportActions({ species:'Goat', name:S('farmerName'), mobile:S('mobile'), email:S('email'),
+    date:D.dateStr, time:D.timeStr, animalType:'Goat', breed:breed, numAnimals:tot,
+    projectCost:totalProject, loan:loan, npv:npv, bcr:bcr, irr:irr, dscr:avgDscr, details:D, zero:ZERO });
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  HEN ENGINE + REPORT  (faithful to "commercial meat native chicken")
+// ════════════════════════════════════════════════════════════════════
+function renderHen(){
+  const out=document.getElementById('out');
+  const NY=Math.max(1,Math.round(P('hRepay')));
+  const birds=P('hBirds'), atTime=Math.max(1,P('hBatchesAtTime'));
+  const batches=Array.from({length:NY},(_,y)=> y===0?P('hBatchesY1'):P('hBatchesY2'));
+  // ── Investment ──
+  const shed=birds*atTime*P('hFloorSpace')*P('hConstrCost');
+  const equip=birds*atTime*P('hEquipBird');
+  const totalCapital=shed+equip;
+  const wcChicks=birds*atTime*P('hChickCost');
+  const wcFeed=birds*atTime*P('hFeedPerBird')*P('hFeedCost');
+  const wcVet=birds*atTime*P('hVetBird');
+  const wcLabour=(P('hWorkers')*P('hWage'))+(P('hWage')/2);
+  const wcElec=P('hElectricity')+(P('hElectricity')/2);
+  const wcLitter=birds*atTime*P('hDeepLitter');
+  const wcMisc=birds*P('hMisc');
+  const totalWC=wcChicks+wcFeed+wcVet+wcLabour+wcElec+wcLitter+wcMisc;
+  const totalProject=Math.floor((totalCapital+totalWC)/1000)*1000;   // ROUNDDOWN(-3)
+  const margin=totalProject*P('hMargin')/100, loan=totalProject-margin, subsidy=totalProject*P('hSubsidy')/100;
+  // ── Repayment (PMT, NO moratorium — EMI from month 1) ──
+  const months=NY*12, mRate=P('hInterest')/100/12, emi=pmt(mRate,months,loan);
+  let bal=loan; const monthly=[];
+  for(let m=1;m<=months;m++){ let intr=bal*mRate, prin=emi-intr, pay=emi; bal-=prin; if(bal<-0.01){prin+=bal;pay+=bal;bal=0;}else if(bal<0)bal=0; monthly.push({m,pay,prin,intr,bal:Math.max(0,bal)}); }
+  const yrInt=[],yrPrin=[]; for(let y=0;y<NY;y++){let si=0,sp=0;for(let k=y*12;k<(y+1)*12;k++){si+=monthly[k].intr;sp+=monthly[k].prin;}yrInt.push(si);yrPrin.push(sp);}
+  // ── Depreciation ──
+  const depB=[],depE=[],depTable=[]; let bb=shed,eb=equip;
+  for(let y=0;y<NY;y++){const a=bb*P('hDepBuilding')/100,b=eb*P('hDepEquip')/100; depTable.push({y:y+1,bBeg:bb,bDep:a,bEnd:bb-a,eBeg:eb,eDep:b,eEnd:eb-b}); depB.push(a);depE.push(b);bb-=a;eb-=b;}
+  const totalDep=depB.map((b,y)=>b+depE[y]);
+  // ── Flock per year ──
+  const introduced=batches.map(b=>birds*b);
+  const mortality=introduced.map(n=>n*P('hMortality')/100);
+  const sold=introduced.map((n,y)=>n-mortality[y]);
+  // ── Income per year ──
+  const birdIncome=sold.map(s=>s*P('hWeight')*P('hSalePrice'));
+  const manureIncome=introduced.map(n=>n*P('hManure'));
+  const totalIncome=birdIncome.map((v,y)=>v+manureIncome[y]);
+  // ── Expenditure per year ──
+  const expChicks=introduced.map(n=>n*P('hChickCost'));
+  const expFeed=introduced.map(n=>n*P('hFeedPerBird')*P('hFeedCost'));
+  const expLitter=introduced.map(n=>n*P('hDeepLitter'));
+  const expVet=introduced.map(n=>n*P('hVetBird'));
+  const expLabour=(P('hWorkers')*P('hWage'))*12;
+  const expElec=P('hElectricity')*12;
+  const expMisc=introduced.map(n=>n*P('hMisc'));
+  const operating=introduced.map((_,y)=>expChicks[y]+expFeed[y]+expLitter[y]+expVet[y]+expLabour+expElec+expMisc[y]);
+  const totalExp=operating.map((op,y)=>op+yrInt[y]+depB[y]+depE[y]);
+  const netIncome=totalIncome.map((ti,y)=>ti-totalExp[y]);
+  // ── Financial Analysis (no Year-6 bug; total revenue all years) ──
+  const r=P('hInterest')/100; const df=[],pwExp=[],pwBen=[];
+  for(let y=0;y<NY;y++){const f=1/Math.pow(1+r,y+1);df.push(f);pwExp.push(totalExp[y]*f);pwBen.push(totalIncome[y]*f);}
+  const sumPWexp=pwExp.reduce((a,b)=>a+b,0), sumPWben=pwBen.reduce((a,b)=>a+b,0);
+  const npv=sumPWben-sumPWexp, bcr=sumPWexp?sumPWben/sumPWexp:0;
+  const rH=(P('hInterest')+20)/100; const inb=totalIncome.map((ti,y)=>ti-totalExp[y]);
+  let pvL=0,pvH=0; for(let y=0;y<NY;y++){pvL+=inb[y]/Math.pow(1+r,y+1);pvH+=inb[y]/Math.pow(1+rH,y+1);}
+  const irr=P('hInterest')+20*(pvL/((pvL+pvH)||1));
+  const dscrNum=totalIncome.map((ti,y)=>ti-operating[y]);
+  const dscrDen=yrPrin.map((p,y)=>p+yrInt[y]);
+  const dscr=dscrNum.map((n,y)=>dscrDen[y]?n/dscrDen[y]:0);
+  const avgDscr=dscrNum.reduce((a,b)=>a+b,0)/(dscrDen.reduce((a,b)=>a+b,0)||1);
+  const ZERO=birds<=0;
+  const dNPV=ZERO?'—':INR(npv), dBCR=ZERO?'—':F2(bcr), dIRR=ZERO?'—':F2(irr)+'%', dDSCR=ZERO?'—':F2(avgDscr);
+
+  const YH=Array.from({length:NY},(_,y)=>ROMAN[y]+' Year');
+  const yhCols=YH.map(h=>`<th class="num">${h}</th>`).join('');
+  let pageNo=0;
+  const pgHeader=()=>`<div class="pg-header"><div><h2>Veterinary College &amp; Research Institute, Namakkal</h2><p>Dept. of Animal Husbandry Economics — Native Chicken Project Report</p></div><div class="r"><b>${S('farmerName')||'—'}</b>${D.dateStr||''}<br>${S('mobile')?'Ph: '+S('mobile'):''}</div></div>`;
+  const page=(c)=>{pageNo++;return `<div class="rpage"><div class="rpage-inner">${pgHeader()}${c}<div class="pg-num"><span class="c">Guided by Dr. V. Senthilkumar, Prof. &amp; Head, Dept. of AH Economics</span> Page ${pageNo}</div></div></div>`;};
+  const breed=S('hBreed')||'Native Chicken';
+  let html='';
+  html+=`<div class="rpage"><div class="cover">
+    <div class="univ">Tamil Nadu Veterinary &amp; Animal Sciences University</div>
+    <div class="inst">Veterinary College &amp; Research Institute, Namakkal</div>
+    <div class="dept">Department of Animal Husbandry Economics</div>
+    <div class="seal">VC<span style="font-size:11px">RI</span></div>
+    <h1>Commercial Meat Type Native Chicken</h1>
+    <div class="subtitle">Bankable Project Report &nbsp;·&nbsp; ${NY}-Year Financial Appraisal</div>
+    <div class="cover-line"></div>
+    <div class="cover-box">
+      <div class="row"><span>Name of the Farmer / Unit</span><b>${S('farmerName')||'—'}</b></div>
+      <div class="row"><span>Breed</span><b>${breed}</b></div>
+      <div class="row"><span>Unit Size</span><b>${NUM(birds)} birds/batch</b></div>
+      <div class="row"><span>Total Project Cost</span><b>${INR(totalProject)}</b></div>
+      <div class="row"><span>Bank Loan</span><b>${INR(loan)}</b></div>
+      <div class="row"><span>Repayment Period</span><b>${NY} Years</b></div>
+      <div class="row"><span>Date of Report</span><b>${D.dateStr||''}</b></div>
+    </div>
+    <div class="cover-foot">Prepared using the VC&amp;RI Livestock Project tool &nbsp;·&nbsp; Guided by <b>Dr. V. Senthilkumar</b></div>
+  </div></div>`;
+  html+=page(`<div class="sec-title">Project at a Glance</div>
+  <table><tr><th style="width:46%">Particulars</th><th>Details</th></tr>
+    <tr><td>1. Name of the Farmer / Unit</td><td>${S('farmerName')||'—'}</td></tr>
+    <tr><td>2. Address of the Farmer</td><td>${S('farmerAddress')||'—'}</td></tr>
+    <tr><td>3. Aadhar Number (optional)</td><td>${S('aadhar')||'—'}</td></tr>
+    <tr><td>4. Mobile Number</td><td>${S('mobile')||'—'}</td></tr>
+    <tr><td>5. E-mail Id (optional)</td><td>${S('email')||'—'}</td></tr>
+    <tr><td>6. Nature of Farming / Activity</td><td>${S('natureFarming')||'Poultry Farming'} — ${NUM(birds)} birds/batch (${breed})</td></tr>
+    <tr><td>7. Address / Location of the Farm</td><td>${S('farmLocation')||'—'}</td></tr>
+    <tr><td>8. Name of the Financing Bank</td><td>${S('bankName')||'—'}</td></tr>
+    <tr><td>9. Name of the Branch</td><td>${S('branchName')||'—'}</td></tr>
+  </table>
+  <table><tr><th style="width:46%">Particulars</th><th class="num">Amount (Rs.)</th></tr>
+    <tr class="sec-row"><td colspan="2">10 · Project Cost</td></tr>
+    <tr><td>Capital &amp; Machinery Investment</td><td class="num">${INR(totalCapital)}</td></tr>
+    <tr><td>Working Capital (one batch)</td><td class="num">${INR(totalWC)}</td></tr>
+    <tr class="total"><td>Total Cost of the Project</td><td class="num">${INR(totalProject)}</td></tr>
+    <tr class="sec-row"><td colspan="2">11 · Means of Finance</td></tr>
+    <tr><td>Bank Loan</td><td class="num">${INR(loan)}</td></tr>
+    <tr><td>Margin Money</td><td class="num">${INR(margin)}</td></tr>
+    <tr><td>Subsidy (${F2(P('hSubsidy'))}%)</td><td class="num">${INR(subsidy)}</td></tr>
+    <tr><td>Rate of Interest</td><td class="num">${F2(P('hInterest'))}% p.a.</td></tr>
+    <tr><td>Repayment Period</td><td class="num">${NY} years</td></tr>
+  </table>
+  <table><tr><th style="width:46%">12 · Project Evaluation</th><th class="num">Value</th></tr>
+    <tr><td>Net Present Value (NPV)</td><td class="num">${dNPV}</td></tr>
+    <tr><td>Benefit–Cost Ratio (BCR)</td><td class="num">${dBCR}</td></tr>
+    <tr><td>Internal Rate of Return (IRR)</td><td class="num">${dIRR}</td></tr>
+    <tr><td>Debt Service Coverage Ratio (avg)</td><td class="num">${dDSCR}</td></tr>
+  </table>`);
+  html+=page(`<div class="sec-title">Investment of the Project</div>
+  <table><tr><th>Particulars</th><th class="num">Amount (Rs.)</th></tr>
+    <tr class="sec-row"><td>A — Capital / Fixed Investment</td><td></td></tr>
+    <tr><td>Construction of Shed (${NUM(birds)} × ${NUM(atTime)} × ${F2(P('hFloorSpace'))} sq.ft × ₹${NUM(P('hConstrCost'))})</td><td class="num">${INR(shed)}</td></tr>
+    <tr><td>Equipment — Feeder &amp; Waterer</td><td class="num">${INR(equip)}</td></tr>
+    <tr class="total"><td>Total Capital Investment</td><td class="num">${INR(totalCapital)}</td></tr>
+    <tr class="sec-row"><td>B — Working Capital (one batch)</td><td></td></tr>
+    <tr><td>Cost of Chicks</td><td class="num">${INR(wcChicks)}</td></tr>
+    <tr><td>Cost of Concentrate Feed</td><td class="num">${INR(wcFeed)}</td></tr>
+    <tr><td>Veterinary Expenses</td><td class="num">${INR(wcVet)}</td></tr>
+    <tr><td>Labour Wages</td><td class="num">${INR(wcLabour)}</td></tr>
+    <tr><td>Electricity Expenses</td><td class="num">${INR(wcElec)}</td></tr>
+    <tr><td>Deep Litter Material</td><td class="num">${INR(wcLitter)}</td></tr>
+    <tr><td>Miscellaneous Expenses</td><td class="num">${INR(wcMisc)}</td></tr>
+    <tr class="total"><td>Total Working Capital</td><td class="num">${INR(totalWC)}</td></tr>
+    <tr class="total"><td>Total Cost of the Project</td><td class="num">${INR(totalProject)}</td></tr>
+  </table>
+  <div class="sec-title">Means of Finance</div>
+  <table><tr><th>Particulars</th><th class="num">Amount (Rs.)</th></tr>
+    <tr><td>Loan from Bank (${F2(100-P('hMargin'))}%)</td><td class="num">${INR(loan)}</td></tr>
+    <tr><td>Margin Money (${F2(P('hMargin'))}%)</td><td class="num">${INR(margin)}</td></tr>
+    <tr class="total"><td>Total</td><td class="num">${INR(loan+margin)}</td></tr>
+    <tr><td>Subsidy available (${F2(P('hSubsidy'))}%)</td><td class="num">${INR(subsidy)}</td></tr>
+  </table>`);
+  html+=page(`<div class="sec-title">Flock Chart</div>
+  <table><tr><th>Particulars</th>${yhCols}</tr>
+    <tr><td>Number of birds per batch</td>${YH.map(()=>`<td class="num">${NUM(birds)}</td>`).join('')}</tr>
+    <tr><td>Number of batches per year</td>${batches.map(b=>`<td class="num">${NUM(b)}</td>`).join('')}</tr>
+    <tr class="subtotal"><td>Number of birds per year</td>${introduced.map(v=>`<td class="num">${NUM(v)}</td>`).join('')}</tr>
+    <tr><td>Mortality (${F2(P('hMortality'))}%)</td>${mortality.map(v=>`<td class="num">${NUM(v)}</td>`).join('')}</tr>
+    <tr class="total"><td>Number of birds for sale</td>${sold.map(v=>`<td class="num">${NUM(v)}</td>`).join('')}</tr>
+  </table>
+  <p class="note">Sale @ ${INR(P('hSalePrice'))}/kg · average weight ${F2(P('hWeight'))} kg/bird · manure ${INR(P('hManure'))}/bird.</p>`);
+  const expRows=[
+    ['Cost of Chicks', expChicks],['Cost of Concentrate Feed', expFeed],['Deep Litter Material', expLitter],
+    ['Veterinary Expenses', expVet],['Labour Charges', YH.map(()=>expLabour)],['Electricity Expenses', YH.map(()=>expElec)],
+    ['Miscellaneous', expMisc],['Interest on Loan', yrInt],['Depreciation — Building', depB],['Depreciation — Equipment', depE]
+  ];
+  html+=page(`<div class="sec-title">Expenditure &amp; Income Statement</div>
+  <table><tr><th>Particulars</th>${yhCols}</tr>
+    <tr class="sec-row"><td>Income</td>${YH.map(()=>'<td></td>').join('')}</tr>
+    <tr><td>By Sale of Birds</td>${birdIncome.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr><td>By Sale of Manure</td>${manureIncome.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr class="total"><td>Total Income</td>${totalIncome.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr class="sec-row"><td>Expenditure</td>${YH.map(()=>'<td></td>').join('')}</tr>
+    ${expRows.map(([l,arr])=>`<tr><td>${l}</td>${arr.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>`).join('')}
+    <tr class="total"><td>Total Expenditure</td>${totalExp.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr class="subtotal"><td>Net Income</td>${netIncome.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+  </table>`);
+  html+=page(`<div class="sec-title">Cash Flow Statement</div>
+  <table><tr><th>Particulars</th>${yhCols}</tr>
+    <tr><td>Total Revenue</td>${totalIncome.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr><td>Total Expenditure</td>${totalExp.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr class="subtotal"><td>Net Revenue</td>${netIncome.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr><td>Add: Interest</td>${yrInt.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr><td>Add: Depreciation</td>${totalDep.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+    <tr class="total"><td>Net Cash Accruals (for Debt Service)</td>${dscrNum.map(v=>`<td class="num">${INR(v)}</td>`).join('')}</tr>
+  </table>`);
+  html+=page(`<div class="sec-title">Loan Repayment — Annual Summary</div>
+  <div class="hl"><div class="b"><label>Loan Amount</label><div class="val">${INR(loan)}</div></div>
+    <div class="b gold"><label>Monthly EMI</label><div class="val">${INR(emi)}</div><p>from Month 1</p></div>
+    <div class="b"><label>Interest Rate</label><div class="val">${F2(P('hInterest'))}%</div><p>no moratorium</p></div></div>
+  <table><tr><th>Year</th><th class="num">Opening Balance</th><th class="num">Principal</th><th class="num">Interest</th><th class="num">Instalment</th><th class="num">Closing Balance</th></tr>
+    ${(()=>{let open=loan,rows='';for(let y=0;y<NY;y++){const close=open-yrPrin[y];rows+=`<tr><td>${YH[y]}</td><td class="num">${INR(open)}</td><td class="num">${INR(yrPrin[y])}</td><td class="num">${INR(yrInt[y])}</td><td class="num">${INR(yrPrin[y]+yrInt[y])}</td><td class="num">${INR(Math.max(0,close))}</td></tr>`;open=close;}return rows;})()}
+  </table>`);
+  html+=page(`<div class="sec-title">Depreciation — Declining Balance Method</div>
+  <p class="note">Building @ ${F2(P('hDepBuilding'))}% · Equipment @ ${F2(P('hDepEquip'))}% per annum.</p>
+  <table><tr><th rowspan="2">Year</th><th colspan="3" style="text-align:center">Building</th><th colspan="3" style="text-align:center">Equipment</th></tr>
+    <tr><th class="num">Beginning</th><th class="num">Depreciation</th><th class="num">End</th><th class="num">Beginning</th><th class="num">Depreciation</th><th class="num">End</th></tr>
+    ${depTable.map(d=>`<tr><td>${ROMAN[d.y-1]}</td><td class="num">${INR(d.bBeg)}</td><td class="num">${INR(d.bDep)}</td><td class="num">${INR(d.bEnd)}</td><td class="num">${INR(d.eBeg)}</td><td class="num">${INR(d.eDep)}</td><td class="num">${INR(d.eEnd)}</td></tr>`).join('')}
+  </table>`);
+  const viable=npv>0&&bcr>1&&irr>P('hInterest')&&avgDscr>1.5;
+  html+=page(`<div class="sec-title">Financial Analysis of the Project</div>
+  <table><tr><th>Year</th><th class="num">Expenditure</th><th class="num">Revenue</th><th class="num">Discount Factor @ ${F2(P('hInterest'))}%</th><th class="num">PW of Cost</th><th class="num">PW of Benefit</th></tr>
+    ${Array.from({length:NY},(_,y)=>`<tr><td>${ROMAN[y]}</td><td class="num">${INR(totalExp[y])}</td><td class="num">${INR(totalIncome[y])}</td><td class="num">${df[y].toFixed(3)}</td><td class="num">${INR(pwExp[y])}</td><td class="num">${INR(pwBen[y])}</td></tr>`).join('')}
+    <tr class="total"><td>Total</td><td></td><td></td><td></td><td class="num">${INR(sumPWexp)}</td><td class="num">${INR(sumPWben)}</td></tr>
+  </table>
+  <div class="hl">
+    <div class="b ${ZERO?'':(npv>0?'':'red')}"><label>Net Present Value</label><div class="val">${dNPV}</div><p>${ZERO?'No birds':(npv>0?'Positive — viable':'Negative')}</p></div>
+    <div class="b ${ZERO?'':(bcr>1?'':'red')}"><label>Benefit–Cost Ratio</label><div class="val">${dBCR}</div><p>${ZERO?'No birds':(bcr>1?'Above 1':'Below 1')}</p></div>
+    <div class="b gold"><label>Internal Rate of Return</label><div class="val">${dIRR}</div><p>${ZERO?'No birds':'vs '+F2(P('hInterest'))+'% rate'}</p></div>
+  </div>
+  <div class="sec-title" style="margin-top:18px">Debt Service Coverage Ratio</div>
+  <table><tr><th>Year</th><th class="num">Net Cash Accruals</th><th class="num">Debt Obligation</th><th class="num">DSCR</th></tr>
+    ${Array.from({length:NY},(_,y)=>`<tr><td>${ROMAN[y]}</td><td class="num">${INR(dscrNum[y])}</td><td class="num">${INR(dscrDen[y])}</td><td class="num">${ZERO?'—':F2(dscr[y])}</td></tr>`).join('')}
+    <tr class="total"><td>Average DSCR</td><td></td><td></td><td class="num">${dDSCR}</td></tr>
+  </table>
+  <div class="verdict"><b>Verdict:</b> ${ZERO?'No birds entered — enter a batch size to evaluate viability.':(viable?`<span class="ok">The project is financially viable and bankable.</span> NPV positive, BCR over 1, IRR ${F2(irr)}% above the lending rate, average DSCR ${F2(avgDscr)} above the 1.5 norm.`:'Review required — one or more indicators are below the bankable threshold.')}</div>`);
+
+  window.__CHART = {
+    species:'Hen', title:'Native Chicken (Broiler)', farmer:S('farmerName')||'—', mobile:S('mobile'),
+    breed:breed, dateStr:D.dateStr||'', unitText:NUM(birds)+' birds/batch',
+    NY:NY, yearLabels:Array.from({length:NY},(_,y)=>ROMAN[y]),
+    npv:npv, bcr:bcr, irr:irr, avgDscr:avgDscr, dscr:dscr.slice(), interest:P('hInterest'),
+    projectCost:totalProject, loan:loan, margin:margin, subsidy:subsidy, emi:emi,
+    capital:totalCapital, workingCapital:totalWC,
+    income:totalIncome.slice(), expenditure:totalExp.slice(), net:netIncome.slice(),
+    loanBalance:(function(){let o=loan;const a=[o];for(let y=0;y<NY;y++){o-=yrPrin[y];a.push(Math.max(0,o));}return a;})(),
+    yrInt:yrInt.slice(), yrPrin:yrPrin.slice(),
+    factUnitLabel:'Birds / batch', factUnitValue:NUM(birds),
+    factOutputLabel:'Birds / year', factOutputValue:NUM(introduced[NY>1?1:0]),
+    incomeBreak:[['Birds',birdIncome[NY>1?1:0]],['Manure',manureIncome[NY>1?1:0]]],
+    costBreak:[['Chicks',expChicks[NY>1?1:0]],['Feed',expFeed[NY>1?1:0]],['Labour',expLabour],['Interest',yrInt[NY>1?1:0]],['Depreciation',depB[NY>1?1:0]+depE[NY>1?1:0]],['Vet & Others',expVet[NY>1?1:0]+expLitter[NY>1?1:0]+expElec+expMisc[NY>1?1:0]]],
+    investBreak:[['Shed',shed],['Equipment',equip]],
+    financeBreak:[['Bank Loan',loan],['Margin Money',margin]],
+    viable:viable, zero:ZERO
+  };
+  out.innerHTML=html;
+  attachReportActions({ species:'Hen', name:S('farmerName'), mobile:S('mobile'), email:S('email'),
+    date:D.dateStr, time:D.timeStr, animalType:'Native Hen', breed:breed, numAnimals:birds,
+    projectCost:totalProject, loan:loan, npv:npv, bcr:bcr, irr:irr, dscr:avgDscr, details:D, zero:ZERO });
+}
+
+// ════════ Shared report actions (Preview / Save PDF / tracking) — used by Goat & Hen ════════
+function attachReportActions(s){
+  const TRACK_URL2="https://script.google.com/macros/s/AKfycbxIQVraHWfJ7nmahwKFGN8EPxmvcqRPp5qFFFLpGwxTACt9znlRwgaIaLdYoexVZVTX/exec";
+  const dscrViable = !s.zero && s.dscr>=2;
+  const pm=document.createElement('div'); pm.className='modal-bg';
+  pm.innerHTML=`<div class="modal"><div class="modal-head"><div class="mh-ic">✓</div><div><h3>Project Summary</h3><p>${(s.name||'Project')} · ${s.animalType} · ${s.breed}</p></div></div>
+    <div class="modal-body">
+      <div class="srow"><span>Total Project Cost</span><b>${INR(s.projectCost)}</b></div>
+      <div class="srow"><span>Bank Loan</span><b>${INR(s.loan)}</b></div>
+      <div class="srow"><span>Net Present Value</span><b class="pill">${s.zero?'—':INR(s.npv)}</b></div>
+      <div class="srow"><span>Benefit–Cost Ratio</span><b class="pill">${s.zero?'—':F2(s.bcr)}</b></div>
+      <div class="srow"><span>Internal Rate of Return</span><b class="pill">${s.zero?'—':F2(s.irr)+'%'}</b></div>
+      <div class="srow"><span>Average DSCR</span><b class="pill">${s.zero?'—':F2(s.dscr)}</b></div>
+    </div>
+    <div class="modal-foot"><button class="mbtn ghost" data-close>Close</button><button class="mbtn primary" id="pmDl2">Save PDF</button></div></div>`;
+  document.body.appendChild(pm);
+  const vm=document.createElement('div'); vm.className='modal-bg';
+  vm.innerHTML=`<div class="modal"><div class="modal-head ok"><div class="mh-ic">✓</div><div><h3>Project is Viable</h3><p>Bankable — ready to save</p></div></div>
+    <div class="modal-body"><div class="viable-note"><div class="big">${F2(s.dscr)}</div><div>The <b>DSCR is ${F2(s.dscr)}</b> (≥ 2.0). The project comfortably services its loan and is <b>bankable &amp; viable</b>.</div></div></div>
+    <div class="modal-foot"><button class="mbtn ghost" data-close>Cancel</button><button class="mbtn primary" id="vmDl2">Save PDF</button></div></div>`;
+  document.body.appendChild(vm);
+  const zm=document.createElement('div'); zm.className='modal-bg';
+  zm.innerHTML=`<div class="modal"><div class="modal-head" style="background:linear-gradient(135deg,#8a1c1c,#c62828)"><div class="mh-ic">!</div><div><h3>Enter Number of Animals</h3></div></div>
+    <div class="modal-body"><div class="viable-note" style="background:#fff5f5;border-color:#f3c2c2"><div class="big" style="color:#c62828">0</div><div>You haven't entered any animals. Please go back and enter the herd size.</div></div></div>
+    <div class="modal-foot"><button class="mbtn ghost" data-close>Close</button><button class="mbtn primary" id="zmGo2">Go to Input Fields</button></div></div>`;
+  document.body.appendChild(zm);
+  const open=m=>m.classList.add('show'), close=m=>m.classList.remove('show');
+  document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',e=>close(e.target.closest('.modal-bg'))));
+  [pm,vm,zm].forEach(m=>m.addEventListener('click',e=>{if(e.target===m)close(m);}));
+  zm.querySelector('#zmGo2').addEventListener('click',()=>{ window.location.href='form.html'; });
+  let saving=false;
+  function doSave(){ if(saving)return; saving=true; close(pm); close(vm);
+    const el=document.getElementById('out'); document.body.classList.add('exporting');
+    const done=()=>{document.body.classList.remove('exporting');saving=false;};
+    if(window.html2pdf){ html2pdf().set({margin:0,filename:s.species+'-Project-Report_'+((s.name||'farm').replace(/[^\w]+/g,'_'))+'.pdf',image:{type:'jpeg',quality:0.98},html2canvas:{scale:2,backgroundColor:'#ffffff',useCORS:true,windowWidth:794},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(el).save().then(done).catch(done); }
+    else { done(); alert('PDF library missing.'); } }
+  function reqSave(){ if(s.zero){ open(zm); return; } close(pm); if(dscrViable) open(vm); else doSave(); }
+  document.getElementById('previewBtn').addEventListener('click',()=> open(s.zero?zm:pm));
+  document.getElementById('downloadBtn').addEventListener('click',()=> s.zero?open(zm):reqSave());
+  pm.querySelector('#pmDl2').addEventListener('click',reqSave);
+  vm.querySelector('#vmDl2').addEventListener('click',doSave);
+  // tracking
+  try{
+    if(!(D.genToken && sessionStorage.getItem('trackSent')===D.genToken)){
+      const payload={ species:s.species, name:s.name, mobile:s.mobile, email:s.email, date:s.date, time:s.time||new Date().toLocaleTimeString('en-IN'),
+        animalType:s.animalType, breed:s.breed, numAnimals:s.numAnimals, projectCost:Math.round(s.projectCost), loan:Math.round(s.loan),
+        npv:Math.round(s.npv), bcr:+(+s.bcr).toFixed(2), irr:+(+s.irr).toFixed(2), dscr:+(+s.dscr).toFixed(2), details:JSON.stringify(s.details) };
+      const url=TRACK_URL2+(TRACK_URL2.indexOf('?')>=0?'&':'?')+'payload='+encodeURIComponent(JSON.stringify(payload));
+      if(window.fetch){ fetch(url,{method:'GET',mode:'no-cors',keepalive:true,cache:'no-store'}).catch(()=>{}); }
+      else { window.__beacons=window.__beacons||[]; const img=new Image(); window.__beacons.push(img); img.src=url; }
+      if(D.genToken) sessionStorage.setItem('trackSent',D.genToken);
+    }
+  }catch(e){}
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  CHART-BASED REPORT  (single-sheet 8-panel infographic · reads window.__CHART)
+//  Pure presentation — no figure here is recalculated.
+// ════════════════════════════════════════════════════════════════════
+(function(){
+  const GREEN='#14532d',GOLD='#f0b429',CREAM='#faf6ea',INK='#1d3b25',MUT='#6b6655';
+  const PAL=['#2e7d32','#f0b429','#c47f3d','#6ba368','#9c6b3f','#4f7d8c'];
+  const sINR=n=>{n=Math.round(n||0);const a=Math.abs(n);if(a>=1e7)return '₹'+(n/1e7).toFixed(2)+' Cr';if(a>=1e5)return '₹'+(n/1e5).toFixed(2)+' L';if(a>=1e3)return '₹'+Math.round(n/1e3)+'k';return '₹'+n;};
+  const sum=arr=>arr.reduce((a,x)=>a+(x[1]||0),0);
+  const colorize=arr=>arr.filter(x=>x[1]>0).map((x,i)=>({label:x[0],v:x[1],c:PAL[i%PAL.length]}));
+
+  function gpt(cx,cy,r,th){const a=th*Math.PI/180;return [cx+r*Math.cos(a),cy-r*Math.sin(a)];}
+  function garc(cx,cy,r,from,to){const s=gpt(cx,cy,r,from),e=gpt(cx,cy,r,to);return `M ${s[0].toFixed(1)} ${s[1].toFixed(1)} A ${r} ${r} 0 0 1 ${e[0].toFixed(1)} ${e[1].toFixed(1)}`;}
+  function gauge(val,max,disp,sub,good,W){
+    W=W||128;const H=Math.round(W*0.66),cx=W/2,cy=W*0.5+2,r=W/2-11;
+    const f=Math.max(0,Math.min(1,(val||0)/(max||1))),col=good?'#2e7d32':'#c98a2e';
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+      <path d="${garc(cx,cy,r,180,0)}" fill="none" stroke="#e4ddc9" stroke-width="10" stroke-linecap="round"/>
+      <path d="${garc(cx,cy,r,180,180-180*f)}" fill="none" stroke="${col}" stroke-width="10" stroke-linecap="round"/>
+      <text x="${cx}" y="${(cy-5).toFixed(1)}" text-anchor="middle" font-size="${(W*0.18).toFixed(0)}" font-weight="800" fill="${INK}" font-family="Arial">${disp}</text>
+      <text x="${cx}" y="${(cy+11).toFixed(1)}" text-anchor="middle" font-size="11" fill="${MUT}" font-family="Arial">${sub||''}</text></svg>`;
+  }
+  function donut(segs,size,sw){
+    sw=sw||20;const cx=size/2,cy=size/2,r=size/2-sw/2-1,C=2*Math.PI*r,total=segs.reduce((a,s)=>a+s.v,0)||1;let off=0,a='';
+    segs.forEach(s=>{const dash=Math.max(0,s.v)/total*C;a+=`<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="none" stroke="${s.c}" stroke-width="${sw}" stroke-dasharray="${dash.toFixed(1)} ${(C-dash).toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}" transform="rotate(-90 ${cx} ${cy})"/>`;off+=dash;});
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${a}</svg>`;
+  }
+  function dleg(segs){return segs.map(s=>`<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:${INK};margin:3px 0;line-height:1.15"><span style="width:10px;height:10px;border-radius:2px;background:${s.c};display:inline-block;flex:none"></span><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.label}</span><b style="flex:none">${sINR(s.v)}</b></div>`).join('');}
+  function donutCell(title,total,segs){return `<div style="display:flex;flex-direction:column;align-items:center;min-width:0">
+    <div class="sub-t" style="text-align:center;margin-bottom:4px">${title}</div>
+    <div style="position:relative;width:104px;height:104px">${donut(segs,104,22)}<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:10px;font-weight:800;color:${INK}">Total</div><div style="font-size:10px;color:${MUT}">${total}</div></div></div>
+    <div style="width:100%;margin-top:7px">${dleg(segs)}</div></div>`;}
+  function barChart(labels,inc,exp,w,h){
+    const pL=56,pR=12,pT=10,pB=24,cw=w-pL-pR,ch=h-pT-pB,max=Math.max(...inc,...exp,1),n=labels.length,gw=cw/n,bw=Math.min(20,gw*0.32);
+    let g='',b='',ax='';
+    for(let i=0;i<=3;i++){const gy=pT+ch-ch*i/3;g+=`<line x1="${pL}" y1="${gy.toFixed(1)}" x2="${(w-pR).toFixed(1)}" y2="${gy.toFixed(1)}" stroke="#e6dec9" stroke-width="1"/><text x="${pL-6}" y="${(gy+3.5).toFixed(1)}" text-anchor="end" font-size="9.5" fill="${MUT}" font-family="Arial">${sINR(max*i/3)}</text>`;}
+    labels.forEach((lb,i)=>{const c=pL+gw*i+gw/2,hi=inc[i]/max*ch,he=exp[i]/max*ch;
+      b+=`<rect x="${(c-bw-2).toFixed(1)}" y="${(pT+ch-hi).toFixed(1)}" width="${bw}" height="${hi.toFixed(1)}" fill="${PAL[0]}" rx="2.5"/><rect x="${(c+2).toFixed(1)}" y="${(pT+ch-he).toFixed(1)}" width="${bw}" height="${he.toFixed(1)}" fill="${PAL[1]}" rx="2.5"/>`;
+      ax+=`<text x="${c.toFixed(1)}" y="${(h-8).toFixed(1)}" text-anchor="middle" font-size="10" fill="${INK}" font-family="Arial">${lb}</text>`;});
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${g}${b}${ax}</svg>`;
+  }
+  function lineChart(vals,w,h){
+    const pL=56,pR=14,pT=10,pB=24,cw=w-pL-pR,ch=h-pT-pB,max=Math.max(...vals,1),n=vals.length;
+    const X=i=>pL+(n<=1?0:cw*i/(n-1)),Y=v=>pT+ch-v/max*ch;
+    let g='';for(let i=0;i<=3;i++){const gy=pT+ch-ch*i/3;g+=`<line x1="${pL}" y1="${gy.toFixed(1)}" x2="${(w-pR).toFixed(1)}" y2="${gy.toFixed(1)}" stroke="#e6dec9" stroke-width="1"/><text x="${pL-6}" y="${(gy+3.5).toFixed(1)}" text-anchor="end" font-size="9.5" fill="${MUT}" font-family="Arial">${sINR(max*i/3)}</text>`;}
+    const pts=vals.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+    const area=`${X(0).toFixed(1)},${(pT+ch).toFixed(1)} ${pts} ${X(n-1).toFixed(1)},${(pT+ch).toFixed(1)}`;
+    let d='',lb='';vals.forEach((v,i)=>{d+=`<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="3.5" fill="#1c6b3a"/>`;lb+=`<text x="${X(i).toFixed(1)}" y="${(h-8).toFixed(1)}" text-anchor="middle" font-size="10" fill="${INK}" font-family="Arial">${i===0?'Start':'Yr '+i}</text>`;});
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${g}<polygon points="${area}" fill="rgba(46,125,50,.13)"/><polyline points="${pts}" fill="none" stroke="#2e7d32" stroke-width="3"/>${d}${lb}</svg>`;
+  }
+
+  function buildSheet(c){
+    const idx=c.NY>1?1:0, pos=c.viable;
+    const emo=c.species==='Goat'?'🐐':(c.species==='Hen'?'🐔':'🐄');
+    const F2=n=>(+n).toFixed(2), pct=n=>(+n).toFixed(1)+'%', mean=a=>a.reduce((x,y)=>x+y,0)/(a.length||1);
+    const incBreak=colorize(c.incomeBreak), costBreak=colorize(c.costBreak), invBreak=colorize(c.investBreak), finBreak=colorize(c.financeBreak);
+    const incomeYr=c.income[idx], expYr=c.expenditure[idx], netYr=c.net[idx];
+    let beYear='—'; for(let y=0;y<c.NY;y++){ if(c.net[y]>0){ beYear='Year '+(y+1); break; } }
+    const seal=pos?{t:'VIABLE & BANKABLE',c1:'#1c7a43',c2:'#11592e',ic:'✓'}:{t:'REVIEW REQUIRED',c1:'#b9822b',c2:'#8a5f17',ic:'!'};
+    const FOOT='VC&RI NAMAKKAL · DEPT. OF AH ECONOMICS · GUIDED BY DR. V. SENTHILKUMAR';
+    const panel=(n,t,body)=>`<div class="cp"><div class="cp-h"><span class="cp-n">${n}</span><span class="cp-t">${t}</span></div><div class="cp-b">${body}</div><div class="cp-f">${FOOT}</div></div>`;
+    const tile=(l,v,s,ac)=>`<div style="flex:1;background:#fff;border:1px solid #ece4cf;border-left:4px solid ${ac||GOLD};border-radius:8px;padding:10px 13px;min-width:0"><div style="font-size:9.5px;letter-spacing:.4px;color:${MUT};text-transform:uppercase;font-weight:700">${l}</div><div style="font-size:22px;font-weight:800;color:${INK};line-height:1.05;margin-top:3px">${v}</div><div style="font-size:9px;color:${MUT};margin-top:1px">${s||''}</div></div>`;
+    const fact=(ic,l,v)=>`<div style="flex:1;text-align:center;padding:0 4px"><div style="font-size:20px;line-height:1">${ic}</div><div style="font-size:16px;font-weight:800;color:${INK};line-height:1.05;margin-top:2px">${v}</div><div style="font-size:8.5px;color:${MUT};text-transform:uppercase;letter-spacing:.3px">${l}</div></div>`;
+
+    /* 01 — COVER (tall portrait) */
+    const refNo='VCRI/'+c.species.toUpperCase().slice(0,2)+'/'+((c.dateStr||'').replace(/\D/g,'').slice(-4)||'0001');
+    const coverBg=c.species==='Cow'
+      ? "linear-gradient(to bottom, rgba(7,38,19,.66) 0%, rgba(7,38,19,.22) 30%, rgba(7,38,19,.78) 66%, rgba(7,38,19,.97) 100%), url('Gemini_Generated_Image_yxhbasyxhbasyxhb.png') center/cover"
+      : "linear-gradient(160deg,#16572f,#0b3a1e)";
+    const watermark=c.species==='Cow' ? '' : `<div style="position:absolute;left:50%;top:34%;transform:transl(-50%,-50%);font-size:150px;opacity:.13;line-height:1">${emo}</div>`;
+    const metric=(l,v)=>`<div style="flex:1;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.20);border-radius:9px;padding:9px 12px"><div style="font-size:9.5px;letter-spacing:.4px;color:#d2e0d3;text-transform:uppercase;font-weight:700">${l}</div><div style="font-size:20px;font-weight:800;color:#fff;line-height:1.1;margin-top:1px">${v}</div></div>`;
+    const p01=`<div class="cp cover" style="background:${coverBg}">${watermark}
+      <div style="position:relative;padding:22px 22px;display:flex;flex-direction:column;height:100%;box-sizing:border-box;text-shadow:0 1px 6px rgba(0,0,0,.6)">
+        <div>
+          <div style="font-size:10px;letter-spacing:2px;color:#e7d49a">VC&amp;RI NAMAKKAL · BANKABLE PROJECT</div>
+          <div style="font-size:30px;font-weight:800;color:${GOLD};font-family:Georgia,serif;line-height:1.02;margin-top:4px">${c.title.toUpperCase()}</div>
+          <div style="font-size:10.5px;letter-spacing:2px;color:#eaf2ea;margin-top:4px">FINANCIAL VIABILITY REPORT</div>
+        </div>
+        <div style="margin-top:auto;display:flex;flex-direction:column;gap:9px">
+          <div style="display:inline-block;align-self:flex-start;background:${GOLD};color:#1c1403;font-size:11px;font-weight:800;padding:5px 13px;border-radius:20px">${c.unitText.toUpperCase()} PROJECT</div>
+          <div style="display:flex;gap:9px">${metric('IRR',pct(c.irr))}${metric('BCR',F2(c.bcr))}</div>
+          <div style="display:flex;gap:9px">${metric('DSCR (avg)',F2(c.avgDscr))}${metric('NPV',sINR(c.npv))}</div>
+          <div style="background:linear-gradient(150deg,${seal.c1},${seal.c2});border:1px solid rgba(255,255,255,.22);border-radius:10px;display:flex;align-items:center;justify-content:center;gap:10px;color:#fff;padding:11px"><span style="font-size:24px">${seal.ic}</span><span style="font-size:15px;font-weight:800;letter-spacing:.5px">${seal.t}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#d6e2d6;border-top:1px solid rgba(255,255,255,.22);padding-top:8px;margin-top:2px">
+            <span>The Manager, ${(typeof S!=='undefined'&&S('bankName'))||'Financing Bank'}</span><span>${c.dateStr||''}</span></div>
+        </div>
+      </div></div>`;
+
+    /* 02 — EXECUTIVE SNAPSHOT (tall) */
+    const p02=panel('02','Executive Snapshot',`<div style="display:flex;flex-direction:column;justify-content:space-between;height:100%">
+      <div><div style="display:flex;gap:10px">${tile('NPV',sINR(c.npv),'present value')}${tile('Loan',sINR(c.loan),'from bank',PAL[5])}</div>
+        <div style="display:flex;gap:10px;margin-top:10px">${tile('IRR',pct(c.irr),'vs '+c.interest+'%')}${tile('DSCR (avg)',F2(c.avgDscr),'debt cover',PAL[0])}</div></div>
+      <div><div class="sub-t" style="text-align:center">Viability Ratio Gauges</div>
+        <div style="display:flex">
+          <div style="flex:1;text-align:center">${gauge(c.irr,Math.max(40,c.irr*1.25),pct(c.irr),'IRR',c.irr>c.interest,132)}</div>
+          <div style="flex:1;text-align:center">${gauge(c.bcr,2.5,F2(c.bcr),'BCR',c.bcr>1,132)}</div>
+          <div style="flex:1;text-align:center">${gauge(c.avgDscr,4,F2(c.avgDscr),'DSCR',c.avgDscr>=1.5,132)}</div>
+        </div></div>
+      <div style="display:flex;background:#fff;border:1px solid #ece4cf;border-radius:9px;padding:10px 3px">${fact('🐄',c.factUnitLabel,c.factUnitValue)}${fact('📦',c.factOutputLabel,c.factOutputValue)}${fact('💰','Income/yr',sINR(incomeYr))}${fact('🗓️','Repay',c.NY+' yr')}</div>
+    </div>`);
+
+    /* 03 — THE MODEL (tall) */
+    const chip=(ic,l,v,hi)=>`<div style="text-align:center;flex:1"><div style="font-size:28px;line-height:1">${ic}</div><div style="font-size:15px;font-weight:800;color:${hi?'#1c7a43':INK};line-height:1.1;margin-top:3px">${v}</div><div style="font-size:9.5px;color:${MUT};text-transform:uppercase;letter-spacing:.3px">${l}</div></div>`;
+    const op=`<div style="flex:none;align-self:center;font-size:24px;font-weight:800;color:${GOLD}">`;
+    const tl=[['Year 1','Project Start']]; if(c.NY>=3)tl.push(['Year 2','Full Production']); if(c.NY>=5)tl.push(['Year '+Math.ceil(c.NY/2),'Break-even']); tl.push(['Year '+c.NY,'Loan Repaid']);
+    const tlHTML=tl.map((t,i)=>`<div style="flex:1;text-align:center;position:relative"><div style="width:15px;height:15px;border-radius:50%;background:${i===tl.length-1?GOLD:'#2e7d32'};margin:0 auto;border:3px solid #fff;box-shadow:0 0 0 1.5px #cfc9b5"></div><div style="font-size:10.5px;font-weight:800;color:${INK};margin-top:5px">${t[0]}</div><div style="font-size:9.5px;color:${MUT};line-height:1.2">${t[1]}</div></div>`).join('');
+    const p03=panel('03','The Model — Business Flow',`<div style="display:flex;flex-direction:column;justify-content:space-around;height:100%">
+      <div><div class="sub-t">The Rupee Flow (per year)</div>
+      <div style="display:flex;align-items:center;gap:2px;background:#fff;border:1px solid #ece4cf;border-radius:10px;padding:16px 8px">
+        ${chip(emo,'Income',sINR(incomeYr))}${op}−</div>${chip('💸','Expenses',sINR(expYr))}${op}=</div>${chip('✅','Net Profit',sINR(netYr),true)}
+      </div></div>
+      <div><div class="sub-t">${c.NY}-Year Journey</div>
+      <div style="position:relative;margin-top:8px"><div style="position:absolute;top:7px;left:8%;right:8%;height:3px;background:#d9d2bd"></div><div style="display:flex;position:relative">${tlHTML}</div></div></div>`);
+
+    /* 04 — THE MONEY (2×2 donuts) */
+    const p04=panel('04','The Money — Investment & Finance',`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;height:100%;align-content:center">
+      ${donutCell('Investment Break-up',sINR(c.capital),invBreak)}
+      ${donutCell('Means of Finance',sINR(c.loan+c.margin),finBreak)}
+      ${donutCell('Income Mix',sINR(sum(c.incomeBreak)),incBreak)}
+      ${donutCell('Annual Cost Break-up',sINR(sum(c.costBreak)),costBreak)}
+    </div>`);
+
+    /* 05 — THE PROOF (tall: chart on top) */
+    const p05=panel('05','The Proof — Performance over '+c.NY+' Years',`<div style="display:flex;flex-direction:column;justify-content:space-between;height:100%">
+      <div><div style="display:flex;justify-content:space-between;align-items:center"><div class="sub-t">Income vs Expenditure</div><div style="font-size:10px;color:${MUT}"><span style="color:${PAL[0]};font-weight:800">■</span> Income &nbsp;<span style="color:${PAL[1]};font-weight:800">■</span> Expenditure</div></div>
+        ${barChart(c.yearLabels,c.income,c.expenditure,412,236)}</div>
+      <div style="display:flex;gap:16px">
+        <div style="flex:1"><div class="sub-t">Break-even Spotlight</div><div style="font-size:11px;color:${INK};line-height:1.45">Net income turns positive at <b>${beYear}</b> and stays positive through Year ${c.NY}.</div></div>
+        <div style="flex:1"><div class="sub-t">Key Numbers (avg/yr)</div>
+          <div style="font-size:11px;color:${INK};display:flex;justify-content:space-between;margin:2px 0"><span>Net Income</span><b>${sINR(mean(c.net))}</b></div>
+          <div style="font-size:11px;color:${INK};display:flex;justify-content:space-between;margin:2px 0"><span>Total Income</span><b>${sINR(mean(c.income))}</b></div>
+          <div style="font-size:11px;color:${INK};display:flex;justify-content:space-between;margin:2px 0"><span>Expenditure</span><b>${sINR(mean(c.expenditure))}</b></div>
+        </div>
+      </div></div>`);
+
+    /* 06 — REPAYMENT (tall: chart on top, table below) */
+    let emiRows=''; const show=Math.min(c.NY,7);
+    for(let y=0;y<show;y++){emiRows+=`<tr><td>${c.yearLabels[y]}</td><td>${sINR(c.loanBalance[y])}</td><td>${sINR((c.yrPrin[y]||0)+(c.yrInt[y]||0))}</td><td>${sINR(c.loanBalance[y+1])}</td></tr>`;}
+    const p06=panel('06','Repayment — Safe & Comfortable',`<div style="display:flex;flex-direction:column;justify-content:space-between;height:100%">
+      <div><div class="sub-t">Loan Balance Outstanding</div>${lineChart(c.loanBalance,412,210)}</div>
+      <div style="display:flex;gap:16px;align-items:flex-start">
+        <div style="flex:1.2"><div class="sub-t">EMI Schedule (₹)</div><table class="emi"><tr><th>Yr</th><th>Opening</th><th>P + I</th><th>Closing</th></tr>${emiRows}</table></div>
+        <div style="flex:.85"><div class="sub-t">Debt Cover</div><div style="font-size:26px;font-weight:800;color:#1c7a43;line-height:1">${F2(c.avgDscr)}x</div><div style="font-size:10.5px;color:${INK};line-height:1.4;margin-top:3px">${c.avgDscr>=1.5?'Above':'Below'} the 1.50x pass line.<br>EMI <b>${sINR(c.emi)}</b>/mo.</div></div>
+      </div></div>`);
+
+    /* 07 — VIABILITY (tall) */
+    const verdict=pos
+      ? 'The project is <b>FINANCIALLY VIABLE &amp; BANKABLE</b>, expected to generate strong, sustainable returns over the '+c.NY+'-year horizon.'
+      : 'One or more indicators are below the bankable threshold (NPV&gt;0, BCR&gt;1, IRR&gt;rate, DSCR&gt;1.5). <b>Review the assumptions</b> before financing.';
+    const p07=panel('07','Viability — The Numbers That Matter',`<div style="display:flex;flex-direction:column;justify-content:space-between;height:100%">
+      <div><div style="display:flex;gap:10px">${tile('NPV',sINR(c.npv),'positive = viable')}${tile('BCR',F2(c.bcr),'> 1 beneficial')}</div>
+        <div style="display:flex;gap:10px;margin-top:10px">${tile('IRR',pct(c.irr),'vs '+c.interest+'%')}${tile('Avg DSCR',F2(c.avgDscr),'> 1.5 safe')}</div></div>
+      <div style="display:flex">
+        <div style="flex:1;text-align:center">${gauge(c.bcr,2.5,F2(c.bcr),'BCR',c.bcr>1,132)}</div>
+        <div style="flex:1;text-align:center">${gauge(c.avgDscr,4,F2(c.avgDscr),'DSCR',c.avgDscr>=1.5,132)}</div>
+        <div style="flex:1;text-align:center">${gauge(c.irr,Math.max(40,c.irr*1.25),pct(c.irr),'IRR',c.irr>c.interest,132)}</div>
+      </div>
+      <div style="background:${pos?'#1c6b3a':'#7c5c1e'};border-left:5px solid ${GOLD};border-radius:9px;padding:12px 14px"><span style="font-size:11px;font-weight:800;color:${GOLD}">VERDICT </span><span style="font-size:11.5px;color:#fff;line-height:1.45">${verdict}</span></div>
+    </div>`);
+
+    /* 08 — ANNEXURES (single column, tall) */
+    const anns=['Detailed Project Cost Statement','Year-wise Income Statement','Year-wise Expenditure Statement','Loan Repayment Schedule','NPV · BCR · IRR Working','Depreciation Schedule','Working Capital Calculation','Sensitivity Analysis'];
+    const annHTML=anns.map((a,i)=>`<div style="display:flex;gap:10px;align-items:center;font-size:11.5px;color:${INK};margin:6px 0"><span style="flex:none;width:21px;height:21px;border-radius:5px;background:${GREEN};color:${GOLD};font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">${i+1}</span><span>${a}</span></div>`).join('');
+    const p08=panel('08','Annexures — Detailed Statements',`<div style="display:flex;flex-direction:column;justify-content:center;height:100%">
+      ${annHTML}
+      <div style="margin-top:12px;background:#fff;border:1px dashed #d9d2bd;border-radius:9px;padding:11px 14px;font-size:11px;color:${MUT};line-height:1.5">Full year-wise statements are provided in the <b>Metrics PDF</b>. Prepared with the VC&amp;RI Namakkal Livestock Project tool for <b>${c.farmer}</b>.</div>
+    </div>`);
+
+    return `<div id="cdoc"><div class="pglab">Page 1 of 2 · A4 Portrait</div><div class="csheet">${p01}${p02}${p03}${p04}</div><div class="pglab">Page 2 of 2 · A4 Portrait</div><div class="csheet">${p05}${p06}${p07}${p08}</div></div>`;
+  }
+
+  // ── preview overlay ──
+  const overlay=document.getElementById('chartPreview');
+  const host=document.getElementById('chartOut');
+  const stage=overlay?overlay.querySelector('.cpv-stage'):null;
+  const PW=1000, PH=1414;
+  function fitScale(){ if(!host||!stage) return; const avail=stage.clientWidth-44; const s=Math.min(1,avail/PW); host.style.transform='scale('+s+')'; host.style.height=((PH*2+78)*s)+'px'; }
+  function openPreview(){
+    const c=window.__CHART; if(!c) return;
+    if(c.zero){ alert('Please go back and enter the number of animals first.'); return; }
+    host.innerHTML=buildSheet(c);
+    overlay.classList.add('show'); fitScale();
+  }
+  function closePreview(){ overlay.classList.remove('show'); host.style.transform='none'; host.style.height='auto'; }
+
+  function downloadPDF(){
+    const c=window.__CHART; if(!c||!host.firstChild) return;
+    const prevT=host.style.transform, prevH=host.style.height;
+    host.style.transform='none'; host.style.height='auto';
+    const restore=()=>{ host.style.transform=prevT; host.style.height=prevH; };
+    const pages=host.querySelectorAll('.csheet');
+    const fname=c.species+'-Chart-Report_'+((c.farmer||'farm').replace(/[^\w]+/g,'_'))+'.pdf';
+    const h2c=window.html2canvas;
+    const JsPDF=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
+    if(h2c && JsPDF){
+      const pdf=new JsPDF({unit:'pt',format:'a4',orientation:'portrait'});
+      const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+      let i=0;
+      (function next(){
+        if(i>=pages.length){ pdf.save(fname); restore(); return; }
+        h2c(pages[i],{scale:2,backgroundColor:'#14532d',useCORS:true,logging:false}).then(canvas=>{
+          if(i>0) pdf.addPage('a4','portrait');
+          pdf.addImage(canvas.toDataURL('image/jpeg',0.98),'JPEG',0,0,pw,ph);
+          i++; next();
+        }).catch(()=>{ restore(); alert('Could not render the chart pages.'); });
+      })();
+    } else if(window.html2pdf){
+      html2pdf().set({margin:0,filename:fname,image:{type:'jpeg',quality:0.98},
+        html2canvas:{scale:2,backgroundColor:'#14532d',useCORS:true,windowWidth:PW},
+        jsPDF:{unit:'pt',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy'],after:'.csheet'}}).from(host.firstChild).save().then(restore).catch(restore);
+    } else { restore(); alert('PDF library missing.'); }
+  }
+  window.addEventListener('resize',()=>{ if(overlay&&overlay.classList.contains('show')) fitScale(); });
+  if(overlay){
+    document.getElementById('cpvClose').addEventListener('click',closePreview);
+    document.getElementById('cpvDl').addEventListener('click',downloadPDF);
+    overlay.addEventListener('click',e=>{ if(e.target===overlay) closePreview(); });
+  }
+
+  // ── dropdown wiring ──
+  const tg=document.getElementById('dlToggle'), menu=document.getElementById('dlMenu');
+  if(tg && menu){
+    tg.addEventListener('click',e=>{ e.stopPropagation(); menu.classList.toggle('show'); });
+    document.addEventListener('click',()=>menu.classList.remove('show'));
+    menu.addEventListener('click',e=>e.stopPropagation());
+    document.getElementById('dlMetrics').addEventListener('click',()=>{ menu.classList.remove('show'); document.getElementById('downloadBtn').click(); });
+    document.getElementById('dlChart').addEventListener('click',()=>{ menu.classList.remove('show'); openPreview(); });
+  }
 })();
 </script>
 </body>

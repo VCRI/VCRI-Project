@@ -54,6 +54,11 @@ body{font-family:'Inter',sans-serif;color:var(--ink);background:var(--cream);lin
 /* inline validation message (only shows on error) */
 .secmsg{font-size:13px;font-weight:600;color:#c62828;background:#fff5f5;border:1px solid #f3c2c2;border-radius:9px;padding:10px 14px;margin-bottom:16px}
 .secmsg:empty{display:none}
+/* Type of Animal selector */
+.species-pick{display:flex;align-items:center;gap:12px;background:var(--gp);border:1.5px solid #bcd8c1;border-radius:12px;padding:12px 16px;margin-bottom:18px}
+.species-pick label{font-size:13px;font-weight:800;color:var(--gd);letter-spacing:.3px}
+.species-pick select{flex:0 0 auto;min-width:180px;font-family:inherit;font-size:14px;font-weight:600;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer}
+.species-pick select:focus{outline:none;border-color:var(--gl);box-shadow:0 0 0 3px rgba(46,125,50,.12)}
 
 /* intro */
 .intro{margin-bottom:22px}
@@ -174,6 +179,10 @@ textarea.ta{resize:vertical;min-height:62px}
         <h1>Enter your details to generate the report</h1>
         <p>Fill in each section below. Default values follow the VC&amp;RI model — change any figure to match your own farm, then click <b>Generate Report</b>.</p>
       </div>
+      <div class="species-pick">
+        <label for="speciesSel">Type of Animal</label>
+        <select id="speciesSel"></select>
+      </div>
       <div class="secmsg" id="footmsg"></div>
       <form id="dform"></form>
     </div>
@@ -196,7 +205,7 @@ const ICONS = {
   returns:'<path d="M3 17l6-6 4 4 8-8M14 7h7v7"/>'
 };
 
-const SECTIONS = [
+const COW_SECTIONS = [
   { id:'details', title:'Your Details', icon:'details',
     note:'Items 1–9 of the “Project at a Glance” — used on the report cover.',
     fields:[
@@ -342,6 +351,183 @@ const SECTIONS = [
     ]},
 ];
 
+// ════════ GOAT schema (Excel: goat final sheet) ════════
+const GOAT_SECTIONS = [
+  COW_SECTIONS[0],   // reuse the exact "Your Details" section
+  { id:'animal', title:'Animal', icon:'animal', note:'Goat type, breed, system and herd size (bucks + does).',
+    fields:[
+      {k:'gBreed', label:'Name of the Breed', type:'select', def:'Tellicherry', opts:['Tellicherry','Boer','Indigenous']},
+      {k:'gSystem', label:'System of Rearing', type:'select', def:'Stall Fed Rearing', opts:['Stall Fed Rearing','Semi Intensive']},
+      {k:'gBucks', label:'Unit Size — Bucks (Male)', type:'num', def:5, unit:'nos', min:0},
+      {k:'gDoes', label:'Unit Size — Does (Female)', type:'num', def:100, unit:'nos', min:0},
+      {k:'gCostMale', label:'Purchase Cost — Buck', type:'num', def:12000, unit:'₹/animal', min:0},
+      {k:'gCostFemale', label:'Purchase Cost — Doe', type:'num', def:10000, unit:'₹/animal', min:0},
+      {k:'gInsurance', label:'Insurance Premium', type:'num', def:6, unit:'% /yr', min:0, step:0.1},
+      {k:'gTransport', label:'Transport Charges', type:'num', def:100, unit:'₹/animal', min:0},
+    ]},
+  { id:'shed', title:'Shed / Building', icon:'shed', note:'Floor space and construction rate for the goat shed and kid pen.',
+    fields:[
+      {k:'gSpaceBuck', label:'Floor Space — Buck', type:'num', def:20, unit:'sq.ft', min:0},
+      {k:'gSpaceDoe', label:'Floor Space — Doe', type:'num', def:10, unit:'sq.ft', min:0},
+      {k:'gSpaceKid', label:'Floor Space — Kid', type:'num', def:4, unit:'sq.ft', min:0},
+      {k:'gShedRate', label:'Construction Cost — Shed', type:'num', def:350, unit:'₹/sq.ft', min:0},
+      {k:'gStoreArea', label:'Floor Space — Store Room', type:'num', def:0, unit:'sq.ft', min:0},
+      {k:'gStoreRate', label:'Construction Cost — Store Room', type:'num', def:0, unit:'₹/sq.ft', min:0},
+    ]},
+  { id:'equip', title:'Equipment', icon:'equip', note:'Goat farm equipment and machinery.',
+    fields:[
+      {k:'gEquipAdult', label:'Equipment — Adult Animal', type:'num', def:20, unit:'₹/animal', min:0},
+      {k:'gEquipKid', label:'Equipment — Kids', type:'num', def:10, unit:'₹/kid', min:0},
+      {k:'gChaffNos', label:'No. of Chaff Cutters', type:'num', def:1, unit:'nos', min:0},
+      {k:'gChaffCost', label:'Cost of Chaff Cutter', type:'num', def:30000, unit:'₹', min:0},
+      {k:'gBrush', label:'Brush Cutter', type:'num', def:0, unit:'₹', min:0},
+      {k:'gFeedMachine', label:'Mini Feed Making Machinery', type:'num', def:0, unit:'₹', min:0},
+      {k:'gMotor', label:'Motor for Irrigation', type:'num', def:0, unit:'₹', min:0},
+      {k:'gSprinkler', label:'Sprinkler & Fogger', type:'num', def:20000, unit:'₹', min:0},
+      {k:'gComputers', label:'Computers', type:'num', def:0, unit:'₹', min:0},
+      {k:'gCCTV', label:'CCTV', type:'num', def:0, unit:'₹', min:0},
+    ]},
+  { id:'infra', title:'Other Infrastructure', icon:'infra', note:'Optional — leave at 0 if not required.',
+    fields:[
+      {k:'gLqArea', label:'Floor Space — Labour Quarters', type:'num', def:0, unit:'sq.ft', min:0},
+      {k:'gLqRate', label:'Construction Cost — Labour Quarters', type:'num', def:0, unit:'₹/sq.ft', min:0},
+      {k:'gTank', label:'Overhead / Water Tank', type:'num', def:0, unit:'₹', min:0},
+      {k:'gFencing', label:'Fencing for Goat Shed', type:'num', def:50000, unit:'₹', min:0},
+      {k:'gLandLevel', label:'Land Levelling', type:'num', def:0, unit:'₹', min:0},
+      {k:'gBorewell', label:'Digging of Borewell', type:'num', def:0, unit:'₹', min:0},
+    ]},
+  { id:'finance', title:'Means of Finance', icon:'finance', note:'Loan terms and subsidy.',
+    fields:[
+      {k:'gMargin', label:'Margin Money', type:'num', def:5, unit:'%', min:0, step:0.1},
+      {k:'gInterest', label:'Rate of Interest', type:'num', def:11.5, unit:'% /yr', min:0, step:0.1},
+      {k:'gRepay', label:'Repayment Period', type:'num', def:7, unit:'years', min:1, max:15},
+      {k:'gSubsidy', label:'Subsidy', type:'num', def:35, unit:'%', min:0, step:0.1},
+    ]},
+  { id:'vehicle', title:'Vehicle', icon:'vehicle', note:'Optional — leave at 0 if no vehicle.',
+    fields:[
+      {k:'gTwoW', label:'Number of Two-Wheelers', type:'num', def:0, unit:'nos', min:0},
+      {k:'gTwoWCost', label:'Cost per Two-Wheeler', type:'num', def:0, unit:'₹', min:0},
+      {k:'gFourW', label:'Number of Four-Wheelers', type:'num', def:0, unit:'nos', min:0},
+      {k:'gFourWCost', label:'Cost per Four-Wheeler', type:'num', def:0, unit:'₹', min:0},
+    ]},
+  { id:'expense', title:'Expenses', icon:'expense', note:'Feed, fodder, vet, utilities and depreciation rates.',
+    fields:[
+      {k:'__s1', type:'sub', label:'Feeding'},
+      {k:'gConcBuck', label:'Concentrate — Buck', type:'num', def:0.3, unit:'kg/day', min:0, step:0.05},
+      {k:'gConcDoe', label:'Concentrate — Doe', type:'num', def:0.2, unit:'kg/day', min:0, step:0.05},
+      {k:'gConcKid', label:'Concentrate — Kid', type:'num', def:0.1, unit:'kg/day', min:0, step:0.05},
+      {k:'gConcCost', label:'Cost of Concentrate Feed', type:'num', def:23, unit:'₹/kg', min:0},
+      {k:'gDryFodder', label:'Cost of Dry Fodder', type:'num', def:50000, unit:'₹/yr', min:0},
+      {k:'gGreenArea', label:'Green Fodder Area', type:'num', def:2, unit:'acres', min:0, step:0.1},
+      {k:'gGreenY1', label:'Green Fodder — Establish (Yr 1)', type:'num', def:5000, unit:'₹/acre', min:0},
+      {k:'gGreenY2', label:'Green Fodder — Yr 2 onward', type:'num', def:3000, unit:'₹/acre', min:0},
+      {k:'__s2', type:'sub', label:'Health &amp; Utilities'},
+      {k:'gVetAdult', label:'Veterinary Aid — Adult', type:'num', def:50, unit:'₹/animal/yr', min:0},
+      {k:'gVetKid', label:'Veterinary Aid — Kid', type:'num', def:20, unit:'₹/kid/yr', min:0},
+      {k:'gElectricity', label:'Electricity Charges', type:'num', def:400, unit:'₹/month', min:0},
+      {k:'gFuel', label:'Fuel Charges', type:'num', def:0, unit:'₹/month', min:0},
+      {k:'gMisc', label:'Miscellaneous / Contingency', type:'num', def:50, unit:'₹/adult/yr', min:0},
+      {k:'gFeedUnit', label:'Feed Making Unit Expenses', type:'num', def:0, unit:'₹/yr', min:0},
+      {k:'__s3', type:'sub', label:'Depreciation Rates'},
+      {k:'gDepBuilding', label:'Depreciation — Buildings', type:'num', def:10, unit:'% /yr', min:0, step:0.1},
+      {k:'gDepEquip', label:'Depreciation — Equipment', type:'num', def:15, unit:'% /yr', min:0, step:0.1},
+    ]},
+  { id:'production', title:'Production', icon:'returns', note:'Goat breeding & kid biology (drives kids for sale).',
+    fields:[
+      {k:'gKiddingInterval', label:'Kidding Interval', type:'num', def:8, unit:'months', min:0},
+      {k:'gKiddings', label:'Number of Kiddings', type:'num', def:2, unit:'/doe/yr', min:0, step:0.1},
+      {k:'gLitter', label:'Average Litter Size', type:'num', def:2, unit:'kids/birth', min:0, step:0.1},
+      {k:'gConception', label:'Conception Rate', type:'num', def:90, unit:'%', min:0, step:0.1},
+      {k:'gKiddingPct', label:'Kidding Percentage', type:'num', def:80, unit:'%', min:0, step:0.1},
+      {k:'gKidMortality', label:'Mortality of Kids', type:'num', def:10, unit:'%', min:0, step:0.1},
+      {k:'gSaleAge', label:'Saleable Age of Kids', type:'num', def:11, unit:'months', min:0},
+      {k:'gReplMale', label:'Replacement Stock — Male', type:'num', def:2, unit:'kids', min:0},
+      {k:'gReplFemale', label:'Replacement Stock — Female', type:'num', def:4, unit:'kids', min:0},
+      {k:'gCullingPct', label:'Culling Percentage', type:'num', def:10, unit:'%', min:0, step:0.1},
+      {k:'gCulledMale', label:'Adult Males Culled', type:'num', def:1, unit:'nos', min:0},
+      {k:'gCulledFemale', label:'Adult Females Culled', type:'num', def:4, unit:'nos', min:0},
+    ]},
+  { id:'labour', title:'Labour', icon:'labour', note:'Number and monthly wages of each worker type.',
+    fields:[
+      {k:'gWorkers', label:'No. of Farm Workers', type:'num', def:1, unit:'nos', min:0},
+      {k:'gWage', label:'Wages — Farm Worker', type:'num', def:10000, unit:'₹/month', min:0},
+      {k:'gManagers', label:'No. of Farm Managers', type:'num', def:0, unit:'nos', min:0},
+      {k:'gMgrSal', label:'Salary — Farm Manager', type:'num', def:0, unit:'₹/month', min:0},
+      {k:'gDrivers', label:'No. of Drivers', type:'num', def:0, unit:'nos', min:0},
+      {k:'gDrvSal', label:'Salary — Driver', type:'num', def:0, unit:'₹/month', min:0},
+      {k:'gOffice', label:'No. of Office Staff', type:'num', def:0, unit:'nos', min:0},
+      {k:'gOffSal', label:'Salary — Office Staff', type:'num', def:0, unit:'₹/month', min:0},
+    ]},
+  { id:'returns', title:'Returns', icon:'returns', note:'Sale prices that drive the income side.',
+    fields:[
+      {k:'gPriceMale', label:'Sale Price — Male Kids', type:'num', def:8000, unit:'₹/kid', min:0},
+      {k:'gPriceFemale', label:'Sale Price — Female Kids', type:'num', def:7000, unit:'₹/kid', min:0},
+      {k:'gCulledPrice', label:'Sale Price — Culled Animal', type:'num', def:7000, unit:'₹/animal', min:0},
+      {k:'gManure', label:'Income from Manure', type:'num', def:50, unit:'₹/animal/yr', min:0},
+    ]},
+];
+
+// ════════ HEN schema (Excel: commercial meat type native chicken) ════════
+const HEN_SECTIONS = [
+  COW_SECTIONS[0],   // reuse the exact "Your Details" section
+  { id:'flock', title:'Flock', icon:'animal', note:'Native meat chicken — batch-cycle (buy chicks, grow, sell, repeat).',
+    fields:[
+      {k:'hBreed', label:'Breed', type:'select', def:'Native / Country Chicken', opts:['Native / Country Chicken','Aseel','Kadaknath','Nattu Kozhi']},
+      {k:'hBirds', label:'Number of Chicks per Batch', type:'num', def:5000, unit:'birds', min:0},
+      {k:'hBatchesAtTime', label:'Batches at a time in Shed', type:'num', def:1, unit:'nos', min:1},
+      {k:'hBatchesY1', label:'Batches Introduced — Year 1', type:'num', def:3, unit:'/yr', min:0},
+      {k:'hBatchesY2', label:'Batches Introduced — Year 2 onward', type:'num', def:4, unit:'/yr', min:0},
+      {k:'hRearWeeks', label:'Rearing Period', type:'num', def:12, unit:'weeks', min:0},
+      {k:'hConstrMonths', label:'Construction Period', type:'num', def:3, unit:'months', min:0},
+      {k:'hChickCost', label:'Purchase Cost of Chicks', type:'num', def:80, unit:'₹/chick', min:0},
+      {k:'hMortality', label:'Mortality', type:'num', def:5, unit:'%', min:0, step:0.1},
+    ]},
+  { id:'shed', title:'Shed &amp; Equipment', icon:'shed', note:'Shed construction and feeder/waterer equipment.',
+    fields:[
+      {k:'hFloorSpace', label:'Floor Space Requirement', type:'num', def:1.25, unit:'sq.ft/bird', min:0, step:0.05},
+      {k:'hConstrCost', label:'Construction Cost', type:'num', def:250, unit:'₹/sq.ft', min:0},
+      {k:'hEquipBird', label:'Equipment — Feeder &amp; Waterer', type:'num', def:25, unit:'₹/bird', min:0},
+    ]},
+  { id:'finance', title:'Means of Finance', icon:'finance', note:'Loan terms and subsidy.',
+    fields:[
+      {k:'hMargin', label:'Margin Money', type:'num', def:12, unit:'%', min:0, step:0.1},
+      {k:'hInterest', label:'Rate of Interest', type:'num', def:12, unit:'% /yr', min:0, step:0.1},
+      {k:'hRepay', label:'Repayment Period', type:'num', def:7, unit:'years', min:1, max:15},
+      {k:'hSubsidy', label:'Subsidy', type:'num', def:25, unit:'%', min:0, step:0.1},
+    ]},
+  { id:'expense', title:'Expenses', icon:'expense', note:'Feed, litter, vet, utilities and depreciation rates.',
+    fields:[
+      {k:'hFeedPerBird', label:'Concentrate Feed Required', type:'num', def:3.5, unit:'kg/bird', min:0, step:0.1},
+      {k:'hFeedCost', label:'Concentrate Feed Cost', type:'num', def:35, unit:'₹/kg', min:0},
+      {k:'hDeepLitter', label:'Deep Litter Material', type:'num', def:1, unit:'₹/chick', min:0, step:0.1},
+      {k:'hVetBird', label:'Veterinary Expenses', type:'num', def:2, unit:'₹/bird', min:0, step:0.1},
+      {k:'hElectricity', label:'Electricity Expenses', type:'num', def:100, unit:'₹/month', min:0},
+      {k:'hMisc', label:'Miscellaneous Expenses', type:'num', def:1, unit:'₹/bird', min:0, step:0.1},
+      {k:'hDepBuilding', label:'Depreciation — Building', type:'num', def:10, unit:'% /yr', min:0, step:0.1},
+      {k:'hDepEquip', label:'Depreciation — Equipment', type:'num', def:15, unit:'% /yr', min:0, step:0.1},
+    ]},
+  { id:'labour', title:'Labour', icon:'labour', note:'Number and monthly wages of workers.',
+    fields:[
+      {k:'hWorkers', label:'No. of Labour Required', type:'num', def:1, unit:'nos', min:0},
+      {k:'hWage', label:'Labour Wages', type:'num', def:12000, unit:'₹/month', min:0},
+    ]},
+  { id:'returns', title:'Returns', icon:'returns', note:'Sale price and bird weight that drive income.',
+    fields:[
+      {k:'hSalePrice', label:'Sale Price of Bird', type:'num', def:150, unit:'₹/kg', min:0},
+      {k:'hWeight', label:'Average Weight at Marketing', type:'num', def:2, unit:'kg/bird', min:0, step:0.1},
+      {k:'hManure', label:'Income from Manure', type:'num', def:0.5, unit:'₹/bird', min:0, step:0.1},
+    ]},
+];
+
+// ════════ SPECIES REGISTRY — Cow, Goat & Hen ════════
+const SPECIES = {
+  Cow:  { label:'Cow / Dairy Farming',     sections: COW_SECTIONS },
+  Goat: { label:'Goat Farming',            sections: GOAT_SECTIONS },
+  Hen:  { label:'Native Hen (Broiler)',    sections: HEN_SECTIONS }
+};
+let speciesKey = 'Cow';
+let SECTIONS = SPECIES[speciesKey].sections;   // active species' sections
+
 // ───────────────────────── RENDER ─────────────────────────
 const form = document.getElementById('dform');
 const sidenav = document.getElementById('sidenav');
@@ -376,39 +562,16 @@ function fieldHTML(f){
     </div>`;
 }
 
-SECTIONS.forEach((s,i)=>{
-  // side nav
-  sidenav.insertAdjacentHTML('beforeend',
-    `<li><a href="#sec-${s.id}" data-sec="${s.id}"><span class="n">${i+1}</span>${s.title}</a></li>`);
-  // section card
-  form.insertAdjacentHTML('beforeend',`
-    <section class="sec" id="sec-${s.id}">
-      <div class="sec-h">
-        <div class="ic"><svg width="21" height="21" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">${ICONS[s.icon]}</svg></div>
-        <h2>${s.title}</h2>
-        <span class="step-tag">Section ${i+1} / ${SECTIONS.length}</span>
-      </div>
-      <p class="sec-note">${s.note}</p>
-      <div class="fields">${s.fields.map(fieldHTML).join('')}</div>
-    </section>`);
-});
-
-// ───────────────────────── LIVE TOTAL (unit size) ─────────────────────────
-const d9=document.getElementById('fld_D9'), f9=document.getElementById('fld_F9'), totval=document.getElementById('totval');
-function updTotal(){ const t=(+d9.value||0)+(+f9.value||0); totval.textContent=t; }
-[d9,f9].forEach(el=>el.addEventListener('input',updTotal)); updTotal();
-
-// ───────────────────────── WIZARD NAVIGATION ─────────────────────────
-const links=[...document.querySelectorAll('.app-sidebar a')];
+// ───────────────────────── WIZARD STATE (rebuilds when species changes) ─────────────────────────
 const appMain=document.getElementById('appMain');
-const secs=[...document.querySelectorAll('.sec')];
 const pfill=document.getElementById('pfill');
 const footmsg=document.getElementById('footmsg');
 const backbtn=document.getElementById('backbtn');
 const nextbtn=document.getElementById('nextbtn');
 const introKick=document.querySelector('.intro .kick');
-const N=SECTIONS.length;
-let cur=0;
+let links=[], secs=[], N=0, cur=0;
+let d9=null, f9=null, totval=null;
+function updTotal(){ if(!totval) return; const t=(+((d9&&d9.value)||0))+(+((f9&&f9.value)||0)); totval.textContent=t; }
 const ARROW='<svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 
 const clearErrors=scope=>(scope||document).querySelectorAll('.err').forEach(e=>e.classList.remove('err'));
@@ -441,7 +604,7 @@ function validateSection(i){
     }
   }
   // 0 animals is allowed (gives an all-zero, income-free project) — only block negatives
-  if(SECTIONS[i].id==='animal' && ((+d9.value||0)<0 || (+f9.value||0)<0)){
+  if(SECTIONS[i].id==='animal' && d9 && f9 && ((+d9.value||0)<0 || (+f9.value||0)<0)){
     d9.classList.add('err'); f9.classList.add('err'); if(!firstBad){firstBad=d9; msg='Unit size cannot be negative.';}
   }
   if(firstBad){
@@ -473,14 +636,6 @@ nextbtn.addEventListener('click',()=>{
   if(cur<N-1) show(cur+1); else submitAll();
 });
 
-// sidebar jump: free when going back; validate intervening sections when going forward
-links.forEach((a,k)=>a.addEventListener('click',e=>{
-  e.preventDefault();
-  if(k<=cur){ show(k); return; }
-  for(let j=cur;j<k;j++){ if(!validateSection(j)){ show(j); return; } }
-  show(k);
-}));
-
 function submitAll(){
   for(let i=0;i<N;i++){ if(!validateSection(i)){ show(i); return; } }
   const data={};
@@ -502,6 +657,7 @@ function submitAll(){
       data[f.k+'_unit']=sel?sel.value:f.unitOpts[0];
     }
   }
+  data.species=speciesKey;
   data.C9=(+data.D9||0)+(+data.F9||0);
   data.numAnimals=data.C9;
   const now=new Date();
@@ -513,15 +669,55 @@ function submitAll(){
   window.location.href='report.html';
 }
 
-// block letters/symbols in number-only fields as the user types
-const mob=document.getElementById('fld_mobile');
-if(mob){ mob.setAttribute('inputmode','numeric'); mob.setAttribute('maxlength','10');
-  mob.addEventListener('input',()=>{ mob.value=mob.value.replace(/\D/g,'').slice(0,10); }); }
-const aad=document.getElementById('fld_aadhar');
-if(aad){ aad.setAttribute('inputmode','numeric'); aad.setAttribute('maxlength','14');
-  aad.addEventListener('input',()=>{ aad.value=aad.value.replace(/[^\d ]/g,'').slice(0,14); }); }
+// build (or rebuild) the whole wizard for the active SECTIONS
+function buildWizard(){
+  sidenav.innerHTML=''; form.innerHTML='';
+  SECTIONS.forEach((s,i)=>{
+    sidenav.insertAdjacentHTML('beforeend',
+      `<li><a href="#sec-${s.id}" data-sec="${s.id}"><span class="n">${i+1}</span>${s.title}</a></li>`);
+    form.insertAdjacentHTML('beforeend',`
+      <section class="sec" id="sec-${s.id}">
+        <div class="sec-h">
+          <div class="ic"><svg width="21" height="21" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">${ICONS[s.icon]}</svg></div>
+          <h2>${s.title}</h2>
+          <span class="step-tag">Section ${i+1} / ${SECTIONS.length}</span>
+        </div>
+        <p class="sec-note">${s.note}</p>
+        <div class="fields">${s.fields.map(fieldHTML).join('')}</div>
+      </section>`);
+  });
+  links=[...document.querySelectorAll('.app-sidebar a')];
+  secs=[...document.querySelectorAll('.sec')];
+  N=SECTIONS.length;
+  // sidebar jump: free going back; validate intervening sections going forward
+  links.forEach((a,k)=>a.addEventListener('click',e=>{
+    e.preventDefault();
+    if(k<=cur){ show(k); return; }
+    for(let j=cur;j<k;j++){ if(!validateSection(j)){ show(j); return; } }
+    show(k);
+  }));
+  // live total (only when this species uses Batch 1 / Batch 2, e.g. Cow)
+  d9=document.getElementById('fld_D9'); f9=document.getElementById('fld_F9'); totval=document.getElementById('totval');
+  if(d9&&f9){ [d9,f9].forEach(el=>el.addEventListener('input',updTotal)); updTotal(); }
+  // digit-only filters for number fields
+  const mob=document.getElementById('fld_mobile');
+  if(mob){ mob.setAttribute('inputmode','numeric'); mob.setAttribute('maxlength','10');
+    mob.addEventListener('input',()=>{ mob.value=mob.value.replace(/\D/g,'').slice(0,10); }); }
+  const aad=document.getElementById('fld_aadhar');
+  if(aad){ aad.setAttribute('inputmode','numeric'); aad.setAttribute('maxlength','14');
+    aad.addEventListener('input',()=>{ aad.value=aad.value.replace(/[^\d ]/g,'').slice(0,14); }); }
+  cur=0; show(0);
+}
 
-show(0);
+// ── Type of Animal selector ──
+const speciesSel=document.getElementById('speciesSel');
+if(speciesSel){
+  speciesSel.innerHTML=Object.keys(SPECIES).map(k=>`<option value="${k}">${SPECIES[k].label}</option>`).join('');
+  speciesSel.value=speciesKey;
+  speciesSel.addEventListener('change',()=>{ speciesKey=speciesSel.value; SECTIONS=SPECIES[speciesKey].sections; buildWizard(); });
+}
+
+buildWizard();
 </script>
 </body>
 </html>
