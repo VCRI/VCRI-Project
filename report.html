@@ -1042,7 +1042,7 @@ document.getElementById('vmDownload').addEventListener('click',doDownload);
 // ════════════════════ USER DATA TRACKING → Google Sheet ════════════════════
 // Paste your deployed Google Apps Script Web App URL between the quotes below.
 // (Setup steps are in SHEET-SETUP.md). Leave blank to disable tracking.
-const TRACK_URL = "https://script.google.com/macros/s/AKfycbxIQVraHWfJ7nmahwKFGN8EPxmvcqRPp5qFFFLpGwxTACt9znlRwgaIaLdYoexVZVTX/exec";
+const TRACK_URL = "__APPS_SCRIPT_URL__";
 
 (function trackGeneration(){
   if(!TRACK_URL) return;
@@ -1882,7 +1882,7 @@ function renderSheep(){
 
 // ════════ Shared report actions (Preview / Save PDF / tracking) — used by Goat, Hen & Sheep ════════
 function attachReportActions(s){
-  const TRACK_URL2="https://script.google.com/macros/s/AKfycbxIQVraHWfJ7nmahwKFGN8EPxmvcqRPp5qFFFLpGwxTACt9znlRwgaIaLdYoexVZVTX/exec";
+  const TRACK_URL2="__APPS_SCRIPT_URL__";
   const dscrViable = !s.zero && s.dscr>=2;
   const pm=document.createElement('div'); pm.className='modal-bg';
   pm.innerHTML=`<div class="modal"><div class="modal-head"><div class="mh-ic">✓</div><div><h3>Project Summary</h3><p>${(s.name||'Project')} · ${s.animalType} · ${s.breed}</p></div></div>
