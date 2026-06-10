@@ -731,10 +731,41 @@ zeroModal.innerHTML = `
 document.body.appendChild(zeroModal);
 zeroModal.querySelector('#zmGo').addEventListener('click',()=>{ window.location.href='form.html'; });
 
+// shown when the project is NOT viable — ask the user to correct their inputs
+const reviewModal = document.createElement('div');
+reviewModal.className = 'modal-bg';
+(function(){
+  const ind=(l,ok,v)=>`<div class="srow"><span>${l}</span><b class="pill" style="background:${ok?'#e7f5ea':'#fdeaea'};color:${ok?'#1c7a43':'#c62828'}">${ok?'✓':'✗'} ${v}</b></div>`;
+  reviewModal.innerHTML = `
+  <div class="modal">
+    <div class="modal-head" style="background:linear-gradient(135deg,#8a1c1c,#c62828)">
+      <div class="mh-ic">!</div>
+      <div><h3>Project Not Yet Bankable</h3><p>One or more indicators are below the required norm</p></div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12.5px;color:var(--muted);margin:0 0 8px;line-height:1.5">For the project to be <b>viable &amp; bankable</b>, all four indicators must pass. Please go back and <b>correct your inputs</b> (for example unit size, costs or sale prices).</p>
+      ${ind('Net Present Value (must be &gt; 0)', npv>0, dNPV)}
+      ${ind('Benefit–Cost Ratio (must be &gt; 1)', bcr>1, dBCR)}
+      ${ind('IRR (must exceed '+F2(P('C53'))+'%)', irr>P('C53'), dIRR)}
+      ${ind('Average DSCR (must be &gt; 1.5)', avgDscr>1.5, dDSCR)}
+    </div>
+    <div class="modal-foot">
+      <button class="mbtn ghost" id="rmSave">Save Anyway</button>
+      <button class="mbtn primary" id="rmEdit">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Correct Inputs
+      </button>
+    </div>
+  </div>`;
+})();
+document.body.appendChild(reviewModal);
+reviewModal.querySelector('#rmEdit').addEventListener('click',()=>{ window.location.href='form.html'; });
+reviewModal.querySelector('#rmSave').addEventListener('click',()=>doDownload());
+
 const openModal  = m => m.classList.add('show');
 const closeModal = m => m.classList.remove('show');
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',e=>closeModal(e.target.closest('.modal-bg'))));
-[previewModal,viableModal,zeroModal].forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) closeModal(m); }));
+[previewModal,viableModal,zeroModal,reviewModal].forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) closeModal(m); }));
 
 let saving=false;
 function doDownload(){
@@ -761,7 +792,8 @@ function doDownload(){
 }
 function requestDownload(){
   closeModal(previewModal);
-  if(dscrViable) openModal(viableModal);   // show viable notification first (DSCR ≥ 2)
+  if(!viable){ openModal(reviewModal); return; }   // NOT bankable → ask user to correct inputs
+  if(dscrViable) openModal(viableModal);            // strongly viable (DSCR ≥ 2)
   else doDownload();
 }
 document.getElementById('previewBtn').addEventListener('click',()=> openModal(ZERO ? zeroModal : previewModal));
@@ -1107,7 +1139,8 @@ function renderGoat(){
   out.innerHTML=html;
   attachReportActions({ species:'Goat', name:S('farmerName'), mobile:S('mobile'), email:S('email'),
     date:D.dateStr, time:D.timeStr, animalType:'Goat', breed:breed, numAnimals:tot,
-    projectCost:totalProject, loan:loan, npv:npv, bcr:bcr, irr:irr, dscr:avgDscr, details:D, zero:ZERO });
+    projectCost:totalProject, loan:loan, npv:npv, bcr:bcr, irr:irr, dscr:avgDscr,
+    viable:viable, interest:P('gInterest'), details:D, zero:ZERO });
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -1341,7 +1374,8 @@ function renderHen(){
   out.innerHTML=html;
   attachReportActions({ species:'Hen', name:S('farmerName'), mobile:S('mobile'), email:S('email'),
     date:D.dateStr, time:D.timeStr, animalType:'Native Hen', breed:breed, numAnimals:birds,
-    projectCost:totalProject, loan:loan, npv:npv, bcr:bcr, irr:irr, dscr:avgDscr, details:D, zero:ZERO });
+    projectCost:totalProject, loan:loan, npv:npv, bcr:bcr, irr:irr, dscr:avgDscr,
+    viable:viable, interest:P('hInterest'), details:D, zero:ZERO });
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -1598,7 +1632,8 @@ function renderSheep(){
   out.innerHTML=html;
   attachReportActions({ species:'Sheep', name:S('farmerName'), mobile:S('mobile'), email:S('email'),
     date:D.dateStr, time:D.timeStr, animalType:'Sheep (Ram Lamb)', breed:breed, numAnimals:lambs,
-    projectCost:totalProject, loan:loan, npv:npv, bcr:bcr, irr:irr, dscr:avgDscr, details:D, zero:ZERO });
+    projectCost:totalProject, loan:loan, npv:npv, bcr:bcr, irr:irr, dscr:avgDscr,
+    viable:viable, interest:P('sInterest'), details:D, zero:ZERO });
 }
 
 // ════════ Shared report actions (Preview / Save PDF / tracking) — used by Goat, Hen & Sheep ════════
@@ -1627,17 +1662,35 @@ function attachReportActions(s){
     <div class="modal-body"><div class="viable-note" style="background:#fff5f5;border-color:#f3c2c2"><div class="big" style="color:#c62828">0</div><div>You haven't entered any animals. Please go back and enter the herd size.</div></div></div>
     <div class="modal-foot"><button class="mbtn ghost" data-close>Close</button><button class="mbtn primary" id="zmGo2">Go to Input Fields</button></div></div>`;
   document.body.appendChild(zm);
+  // review modal — shown when the project is NOT viable (ask the user to correct inputs)
+  const rm=document.createElement('div'); rm.className='modal-bg';
+  (function(){
+    const ind=(l,ok,v)=>`<div class="srow"><span>${l}</span><b class="pill" style="background:${ok?'#e7f5ea':'#fdeaea'};color:${ok?'#1c7a43':'#c62828'}">${ok?'✓':'✗'} ${v}</b></div>`;
+    const it=(s.interest!=null?s.interest:0);
+    rm.innerHTML=`<div class="modal"><div class="modal-head" style="background:linear-gradient(135deg,#8a1c1c,#c62828)"><div class="mh-ic">!</div><div><h3>Project Not Yet Bankable</h3><p>One or more indicators are below the required norm</p></div></div>
+      <div class="modal-body"><p style="font-size:12.5px;color:var(--muted);margin:0 0 8px;line-height:1.5">For the project to be <b>viable &amp; bankable</b>, all four indicators must pass. Please go back and <b>correct your inputs</b> (for example unit size, costs or sale prices).</p>
+      ${ind('Net Present Value (must be &gt; 0)', s.npv>0, INR(s.npv))}
+      ${ind('Benefit–Cost Ratio (must be &gt; 1)', s.bcr>1, F2(s.bcr))}
+      ${ind('IRR (must exceed '+F2(it)+'%)', s.irr>it, F2(s.irr)+'%')}
+      ${ind('Average DSCR (must be &gt; 1.5)', s.dscr>1.5, F2(s.dscr))}
+      </div>
+      <div class="modal-foot"><button class="mbtn ghost" id="rmSave2">Save Anyway</button><button class="mbtn primary" id="rmEdit2"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Correct Inputs</button></div></div>`;
+  })();
+  document.body.appendChild(rm);
+  const isViable=(s.viable!=null)?s.viable:(!s.zero && s.npv>0 && s.bcr>1 && s.dscr>1.5 && (s.interest==null||s.irr>s.interest));
   const open=m=>m.classList.add('show'), close=m=>m.classList.remove('show');
   document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',e=>close(e.target.closest('.modal-bg'))));
-  [pm,vm,zm].forEach(m=>m.addEventListener('click',e=>{if(e.target===m)close(m);}));
+  [pm,vm,zm,rm].forEach(m=>m.addEventListener('click',e=>{if(e.target===m)close(m);}));
   zm.querySelector('#zmGo2').addEventListener('click',()=>{ window.location.href='form.html'; });
+  rm.querySelector('#rmEdit2').addEventListener('click',()=>{ window.location.href='form.html'; });
+  rm.querySelector('#rmSave2').addEventListener('click',()=>doSave());
   let saving=false;
   function doSave(){ if(saving)return; saving=true; close(pm); close(vm);
     const el=document.getElementById('out'); document.body.classList.add('exporting');
     const done=()=>{document.body.classList.remove('exporting');saving=false;};
     if(window.html2pdf){ html2pdf().set({margin:0,filename:s.species+'-Project-Report_'+((s.name||'farm').replace(/[^\w]+/g,'_'))+'.pdf',image:{type:'jpeg',quality:0.98},html2canvas:{scale:2,backgroundColor:'#ffffff',useCORS:true,windowWidth:794},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(el).save().then(done).catch(done); }
     else { done(); alert('PDF library missing.'); } }
-  function reqSave(){ if(s.zero){ open(zm); return; } close(pm); if(dscrViable) open(vm); else doSave(); }
+  function reqSave(){ if(s.zero){ open(zm); return; } close(pm); if(!isViable){ open(rm); return; } if(dscrViable) open(vm); else doSave(); }
   document.getElementById('previewBtn').addEventListener('click',()=> open(s.zero?zm:pm));
   document.getElementById('downloadBtn').addEventListener('click',()=> s.zero?open(zm):reqSave());
   pm.querySelector('#pmDl2').addEventListener('click',reqSave);
