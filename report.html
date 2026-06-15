@@ -143,6 +143,12 @@ body.exporting .rpage:first-child{page-break-before:auto}
 body.exporting .rpage-inner{padding:13mm 14mm;min-height:1123px;box-sizing:border-box;display:flex;flex-direction:column}
 body.exporting .pg-body{flex:1 1 auto;min-height:0}
 body.exporting .pg-num{margin-top:10px}
+/* on-screen preview: every sheet shows as a full A4 page too (short sections just
+   leave empty space at the bottom) — responsive via aspect-ratio, content grows the
+   page if ever taller than A4 (it won't: repaginate keeps each page within A4). */
+body:not(.exporting) .rpage-inner{aspect-ratio:210/297;box-sizing:border-box;display:flex;flex-direction:column}
+body:not(.exporting) .pg-body{flex:1 1 auto;min-height:0}
+body:not(.exporting) .cover{aspect-ratio:210/297;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center}
 .rsec+.rsec{margin-top:22px}
 /* cover: a clean full-white title page with everything centred on the page. */
 body.exporting .cover{min-height:1123px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#fff}
@@ -437,6 +443,9 @@ function repaginate(){
 
   blocks.forEach(b=>{
     const gap = b.sectionStart ? SECTION_GAP : 0;
+    // one section per page: every top-level section begins on a fresh A4 page
+    // (sub-parts inside the same section stay together; long tables still flow over)
+    if(b.sectionStart && cur.length) commit();
     // keep a title with the start of its table: if little room is left, break first
     if(b.isTitle && cur.length && room()<120) commit();
 
@@ -748,6 +757,75 @@ html += page(`
   <tr><td>Internal Rate of Return (IRR)</td><td class="num">${dIRR}</td></tr>
   <tr><td>Debt Service Coverage Ratio (avg)</td><td class="num">${dDSCR}</td></tr>
 </table>`);
+
+// ── TECHNO-ECONOMIC PARAMETERS ──
+{
+  const TE=(l,v,u='')=>`<tr><td>${l}</td><td class="num">${v}</td><td>${u}</td></tr>`;
+  const G=t=>`<tr class="sec-row"><td colspan="3">${t}</td></tr>`;
+  const nz=(l,k,u='',fmt=NUM)=>P(k)>0?TE(l,fmt(P(k)),u):'';     // optional row — hidden when zero
+  html += page(`
+<div class="sec-title">Techno-Economic Parameters</div>
+<table>
+  <tr><th style="width:54%">Parameter</th><th class="num">Value</th><th>Unit</th></tr>
+  ${G('Production &amp; Animal')}
+  ${TE('Type of Milch Animal',S('C7'))}
+  ${TE('Name of the Breed',S('C8'))}
+  ${TE('Unit Size (Batch 1 + Batch 2)',NUM(P('D9'))+' + '+NUM(P('F9'))+' = '+NUM(P('C9')),'animals')}
+  ${TE('Purchase Cost of Animals',INR(P('C10')),'per animal')}
+  ${TE('Average Milk Yield',F2(P('C11')),'L/day')}
+  ${TE('Insurance Premium',F2(P('C12')),'% /yr')}
+  ${TE('Transport Charges',INR(P('C13')),'per animal')}
+  ${G('Shed / Building')}
+  ${TE('Floor Space — Milch Animal',NUM(P('C16')),'sq.ft')}
+  ${TE('Construction Cost — Animal Shed',INR(P('C17')),'₹/sq.ft')}
+  ${nz('Floor Space — Calves','C18','sq.ft')}
+  ${nz('Construction Cost — Calves Shed','C19','₹/sq.ft',INR)}
+  ${nz('Floor Space — Store Room','C20','sq.ft')}
+  ${nz('Construction Cost — Store Room','C21','₹/sq.ft',INR)}
+  ${G('Equipment')}
+  ${nz('Feeder &amp; Waterer','C24','per animal',INR)}
+  ${nz('Milking Can','C25','₹',INR)}
+  ${nz('Milking Machine','C26','₹',INR)}
+  ${nz('Chaff Cutter','C27','₹',INR)}
+  ${nz('Brush Cutter','C28','₹',INR)}
+  ${nz('Feed Making Machinery','C29','₹',INR)}
+  ${G('Means of Finance')}
+  ${TE('Margin Money',F2(P('C52')),'%')}
+  ${TE('Rate of Interest',F2(P('C53')),'% /yr')}
+  ${TE('Repayment Period',NY,'years')}
+  ${TE('Subsidy',F2(P('C55')),'% of project cost')}
+  ${G('Feeding')}
+  ${TE('Total Milking Period',NUM(P('C64')),'days/yr')}
+  ${TE('Total Dry Period',NUM(P('C65')),'days/yr')}
+  ${TE('Concentrate — Milking Period',F2(P('C66')),'kg/day')}
+  ${TE('Concentrate — Dry Period',F2(P('C67')),'kg/day')}
+  ${TE('Cost of Concentrate Feed',INR(P('C68')),'₹/kg')}
+  ${TE('Dry Fodder Requirement',F2(P('C69')),'kg/day')}
+  ${TE('Cost of Dry Fodder',INR(P('C70')),'₹/kg')}
+  ${TE('Green Fodder Area',F2(P('C71')),'acres')}
+  ${TE('Green Fodder — Establish (Yr 1)',INR(P('C72')),'₹/acre')}
+  ${TE('Green Fodder — Yr 2 onward',INR(P('C73')),'₹/acre')}
+  ${G('Health, Utilities &amp; Depreciation')}
+  ${TE('Veterinary Aid',INR(P('C74')),'₹/animal/yr')}
+  ${TE('Electricity Charges',INR(P('C75')),'₹/month')}
+  ${nz('Fuel Charges','C76','₹/month',INR)}
+  ${TE('Miscellaneous Expenses',INR(P('C79')),'₹/animal/yr')}
+  ${TE('Depreciation — Buildings',F2(P('C77')),'% /yr')}
+  ${TE('Depreciation — Equipment',F2(P('C78')),'% /yr')}
+  ${G('Labour')}
+  ${nz('No. of Farm Workers','C86','nos')}
+  ${nz('Wages — Farm Worker','C87','₹/month',INR)}
+  ${nz('No. of Farm Managers','C88','nos')}
+  ${nz('Salary — Farm Manager','C89','₹/month',INR)}
+  ${nz('No. of Drivers','C90','nos')}
+  ${nz('Salary — Driver','C91','₹/month',INR)}
+  ${G('Returns')}
+  ${TE('Sale Price of Milk',INR(P('C96')),'₹/litre')}
+  ${TE('Sale Price of Male Calves',INR(P('C97')),'₹/calf')}
+  ${TE('Value of Female Calves',INR(P('C98')),'₹/calf')}
+  ${TE('Sale Price of Manure',INR(P('C99')),'₹/animal/yr')}
+</table>`);
+}
 
 // ── INVESTMENT ──
 html += page(`
@@ -1261,6 +1339,90 @@ function renderGoat(){
     <tr><td>Internal Rate of Return (IRR)</td><td class="num">${dIRR}</td></tr>
     <tr><td>Debt Service Coverage Ratio (avg)</td><td class="num">${dDSCR}</td></tr>
   </table>`);
+  // ── TECHNO-ECONOMIC PARAMETERS ──
+  {
+    const TE=(l,v,u='')=>`<tr><td>${l}</td><td class="num">${v}</td><td>${u}</td></tr>`;
+    const G=t=>`<tr class="sec-row"><td colspan="3">${t}</td></tr>`;
+    const nz=(l,k,u='',fmt=NUM)=>P(k)>0?TE(l,fmt(P(k)),u):'';     // optional row — hidden when zero
+    html+=page(`<div class="sec-title">Techno-Economic Parameters</div>
+  <table>
+    <tr><th style="width:54%">Parameter</th><th class="num">Value</th><th>Unit</th></tr>
+    ${G('Production &amp; Animal')}
+    ${TE('Name of the Breed',S('gBreed')||'Goat')}
+    ${TE('System of Rearing',S('gSystem'))}
+    ${TE('Unit Size',NUM(bucks)+' Bucks + '+NUM(does)+' Does = '+NUM(tot),'animals')}
+    ${TE('Purchase Cost — Buck',INR(P('gCostMale')),'per animal')}
+    ${TE('Purchase Cost — Doe',INR(P('gCostFemale')),'per animal')}
+    ${TE('Insurance Premium',F2(P('gInsurance')),'% /yr')}
+    ${TE('Transport Charges',INR(P('gTransport')),'per animal')}
+    ${G('Shed / Building')}
+    ${TE('Floor Space — Buck',NUM(P('gSpaceBuck')),'sq.ft')}
+    ${TE('Floor Space — Doe',NUM(P('gSpaceDoe')),'sq.ft')}
+    ${TE('Floor Space — Kid',NUM(P('gSpaceKid')),'sq.ft')}
+    ${TE('Construction Cost — Shed',INR(P('gShedRate')),'₹/sq.ft')}
+    ${nz('Floor Space — Store Room','gStoreArea','sq.ft')}
+    ${nz('Construction Cost — Store Room','gStoreRate','₹/sq.ft',INR)}
+    ${nz('Floor Space — Labour Quarters','gLqArea','sq.ft')}
+    ${nz('Construction Cost — Labour Quarters','gLqRate','₹/sq.ft',INR)}
+    ${G('Equipment')}
+    ${TE('Equipment — Adult Animal',INR(P('gEquipAdult')),'per animal')}
+    ${TE('Equipment — Kids',INR(P('gEquipKid')),'per kid')}
+    ${nz('No. of Chaff Cutters','gChaffNos','nos')}
+    ${nz('Cost of Chaff Cutter','gChaffCost','₹',INR)}
+    ${nz('Brush Cutter','gBrush','₹',INR)}
+    ${nz('Mini Feed Making Machinery','gFeedMachine','₹',INR)}
+    ${nz('Motor for Irrigation','gMotor','₹',INR)}
+    ${nz('Sprinkler &amp; Fogger','gSprinkler','₹',INR)}
+    ${nz('Computers','gComputers','₹',INR)}
+    ${nz('CCTV','gCCTV','₹',INR)}
+    ${G('Other Infrastructure')}
+    ${nz('Overhead / Water Tank','gTank','₹',INR)}
+    ${nz('Fencing for Goat Shed','gFencing','₹',INR)}
+    ${nz('Land Levelling','gLandLevel','₹',INR)}
+    ${nz('Digging of Borewell','gBorewell','₹',INR)}
+    ${nz('No. of Two-Wheelers','gTwoW','nos')}
+    ${nz('Cost per Two-Wheeler','gTwoWCost','₹',INR)}
+    ${nz('No. of Four-Wheelers','gFourW','nos')}
+    ${nz('Cost per Four-Wheeler','gFourWCost','₹',INR)}
+    ${G('Means of Finance')}
+    ${TE('Margin Money',F2(P('gMargin')),'%')}
+    ${TE('Rate of Interest',F2(P('gInterest')),'% /yr')}
+    ${TE('Repayment Period',NY,'years')}
+    ${TE('Subsidy',F2(P('gSubsidy')),'% of project cost')}
+    ${G('Feeding')}
+    ${TE('Concentrate — Buck',F2(P('gConcBuck')),'kg/day')}
+    ${TE('Concentrate — Doe',F2(P('gConcDoe')),'kg/day')}
+    ${TE('Concentrate — Kid',F2(P('gConcKid')),'kg/day')}
+    ${TE('Cost of Concentrate Feed',INR(P('gConcCost')),'₹/kg')}
+    ${TE('Cost of Dry Fodder',INR(P('gDryFodder')),'₹/yr')}
+    ${TE('Green Fodder Area',F2(P('gGreenArea')),'acres')}
+    ${TE('Green Fodder — Establish (Yr 1)',INR(P('gGreenY1')),'₹/acre')}
+    ${TE('Green Fodder — Yr 2 onward',INR(P('gGreenY2')),'₹/acre')}
+    ${G('Health, Utilities &amp; Depreciation')}
+    ${TE('Veterinary Aid — Adult',INR(P('gVetAdult')),'₹/animal/yr')}
+    ${TE('Veterinary Aid — Kid',INR(P('gVetKid')),'₹/kid/yr')}
+    ${TE('Electricity Charges',INR(P('gElectricity')),'₹/month')}
+    ${nz('Fuel Charges','gFuel','₹/month',INR)}
+    ${TE('Miscellaneous / Contingency',INR(P('gMisc')),'₹/adult/yr')}
+    ${nz('Feed Making Unit Expenses','gFeedUnit','₹/yr',INR)}
+    ${TE('Depreciation — Buildings',F2(P('gDepBuilding')),'% /yr')}
+    ${TE('Depreciation — Equipment',F2(P('gDepEquip')),'% /yr')}
+    ${G('Labour')}
+    ${nz('No. of Farm Workers','gWorkers','nos')}
+    ${nz('Wages — Farm Worker','gWage','₹/month',INR)}
+    ${nz('No. of Farm Managers','gManagers','nos')}
+    ${nz('Salary — Farm Manager','gMgrSal','₹/month',INR)}
+    ${nz('No. of Drivers','gDrivers','nos')}
+    ${nz('Salary — Driver','gDrvSal','₹/month',INR)}
+    ${nz('No. of Office Staff','gOffice','nos')}
+    ${nz('Salary — Office Staff','gOffSal','₹/month',INR)}
+    ${G('Returns')}
+    ${TE('Sale Price — Male Kids',INR(P('gPriceMale')),'₹/kid')}
+    ${TE('Sale Price — Female Kids',INR(P('gPriceFemale')),'₹/kid')}
+    ${TE('Sale Price — Culled Animal',INR(P('gCulledPrice')),'₹/animal')}
+    ${TE('Income from Manure',INR(P('gManure')),'₹/animal/yr')}
+  </table>`);
+  }
   // investment
   html+=page(`<div class="sec-title">Investment of the Project</div>
   <table><tr><th>Particulars</th><th class="num">Amount (Rs.)</th></tr>
@@ -1507,6 +1669,53 @@ function renderHen(){
     <tr><td>Internal Rate of Return (IRR)</td><td class="num">${dIRR}</td></tr>
     <tr><td>Debt Service Coverage Ratio (avg)</td><td class="num">${dDSCR}</td></tr>
   </table>`);
+  // ── TECHNO-ECONOMIC PARAMETERS ──
+  {
+    const TE=(l,v,u='')=>`<tr><td>${l}</td><td class="num">${v}</td><td>${u}</td></tr>`;
+    const G=t=>`<tr class="sec-row"><td colspan="3">${t}</td></tr>`;
+    const nz=(l,k,u='',fmt=NUM)=>P(k)>0?TE(l,fmt(P(k)),u):'';     // optional row — hidden when zero
+    html+=page(`<div class="sec-title">Techno-Economic Parameters</div>
+  <table>
+    <tr><th style="width:54%">Parameter</th><th class="num">Value</th><th>Unit</th></tr>
+    ${G('Production &amp; Bird')}
+    ${TE('Name of the Breed',breed)}
+    ${TE('Number of Chicks per Batch',NUM(birds),'birds')}
+    ${TE('Batches at a Time in Shed',NUM(atTime),'nos')}
+    ${TE('Batches Introduced — Year 1',NUM(P('hBatchesY1')),'/yr')}
+    ${TE('Batches Introduced — Year 2 onward',NUM(P('hBatchesY2')),'/yr')}
+    ${TE('Rearing Period',NUM(P('hRearWeeks')),'weeks')}
+    ${TE('Construction Period',NUM(P('hConstrMonths')),'months')}
+    ${TE('Purchase Cost of Chicks',INR(P('hChickCost')),'₹/chick')}
+    ${TE('Mortality',F2(P('hMortality')),'%')}
+    ${G('Shed / Building')}
+    ${TE('Floor Space Requirement',F2(P('hFloorSpace')),'sq.ft/bird')}
+    ${TE('Construction Cost',INR(P('hConstrCost')),'₹/sq.ft')}
+    ${G('Equipment')}
+    ${TE('Feeder &amp; Waterer',INR(P('hEquipBird')),'₹/bird')}
+    ${G('Means of Finance')}
+    ${TE('Margin Money',F2(P('hMargin')),'%')}
+    ${TE('Rate of Interest',F2(P('hInterest')),'% /yr')}
+    ${TE('Repayment Period',NY,'years')}
+    ${TE('Subsidy',F2(P('hSubsidy')),'% of project cost')}
+    ${G('Feeding')}
+    ${TE('Concentrate Feed Required',F2(P('hFeedPerBird')),'kg/bird')}
+    ${TE('Concentrate Feed Cost',INR(P('hFeedCost')),'₹/kg')}
+    ${TE('Deep Litter Material',INR(P('hDeepLitter')),'₹/chick')}
+    ${G('Health, Utilities &amp; Depreciation')}
+    ${TE('Veterinary Expenses',INR(P('hVetBird')),'₹/bird')}
+    ${TE('Electricity Expenses',INR(P('hElectricity')),'₹/month')}
+    ${TE('Miscellaneous Expenses',INR(P('hMisc')),'₹/bird')}
+    ${TE('Depreciation — Building',F2(P('hDepBuilding')),'% /yr')}
+    ${TE('Depreciation — Equipment',F2(P('hDepEquip')),'% /yr')}
+    ${G('Labour')}
+    ${nz('No. of Labour Required','hWorkers','nos')}
+    ${nz('Labour Wages','hWage','₹/month',INR)}
+    ${G('Returns')}
+    ${TE('Sale Price of Bird',INR(P('hSalePrice')),'₹/kg')}
+    ${TE('Average Weight at Marketing',F2(P('hWeight')),'kg/bird')}
+    ${TE('Income from Manure',INR(P('hManure')),'₹/bird')}
+  </table>`);
+  }
   html+=page(`<div class="sec-title">Investment of the Project</div>
   <table><tr><th>Particulars</th><th class="num">Amount (Rs.)</th></tr>
     <tr class="sec-row"><td>A — Capital / Fixed Investment</td><td></td></tr>
@@ -1778,6 +1987,80 @@ function renderSheep(){
     <tr><td>Internal Rate of Return (IRR)</td><td class="num">${dIRR}</td></tr>
     <tr><td>Debt Service Coverage Ratio (avg)</td><td class="num">${dDSCR}</td></tr>
   </table>`);
+  // ── TECHNO-ECONOMIC PARAMETERS ──
+  {
+    const TE=(l,v,u='')=>`<tr><td>${l}</td><td class="num">${v}</td><td>${u}</td></tr>`;
+    const G=t=>`<tr class="sec-row"><td colspan="3">${t}</td></tr>`;
+    const nz=(l,k,u='',fmt=NUM)=>P(k)>0?TE(l,fmt(P(k)),u):'';     // optional row — hidden when zero
+    html+=page(`<div class="sec-title">Techno-Economic Parameters</div>
+  <table>
+    <tr><th style="width:54%">Parameter</th><th class="num">Value</th><th>Unit</th></tr>
+    ${G('Production &amp; Animal')}
+    ${TE('Breed',breed)}
+    ${TE('Unit Size',NUM(lambs),'ram lambs / batch')}
+    ${TE('Batches at a Time in Shed',NUM(P('sBatchesAtTime')),'nos')}
+    ${TE('Batches Introduced per Year',NUM(batchesY),'/yr')}
+    ${TE('Fattening Period',NUM(days),'days')}
+    ${TE('Weight at Purchase',F2(P('sPurWeight')),'kg/lamb')}
+    ${TE('Weight at Marketing',F2(P('sMktWeight')),'kg/lamb')}
+    ${TE('Purchase Cost of Ram Lamb',INR(P('sPurchaseCost')),'₹/lamb')}
+    ${TE('Insurance Premium',F2(P('sInsurance')),'% /yr')}
+    ${TE('Transport Charges',INR(P('sTransport')),'₹/lamb')}
+    ${TE('Mortality',F2(P('sMortality')),'%')}
+    ${G('Shed / Building')}
+    ${TE('Floor Space — Lamb Shed',F2(P('sFloorSpace')),'sq.ft/lamb')}
+    ${TE('Construction Cost — Lamb Shed',INR(P('sShedCost')),'₹/lamb')}
+    ${nz('Store Room Area','sStoreArea','sq.ft')}
+    ${nz('Store Room Cost','sStoreCost','₹/sq.ft',INR)}
+    ${nz('Labour Quarters — Floor Space','sLqArea','sq.ft')}
+    ${nz('Labour Quarters — Cost','sLqCost','₹/sq.ft',INR)}
+    ${G('Equipment')}
+    ${TE('Feeder &amp; Waterer',INR(P('sEquipLamb')),'₹/lamb')}
+    ${nz('Chaff Cutter','sChaff','₹',INR)}
+    ${nz('Concentrate Feed Making Machinery','sFeedMachine','₹',INR)}
+    ${nz('Sprinkler &amp; Fogger','sSprinkler','₹',INR)}
+    ${nz('Overhead Tank','sTank','₹',INR)}
+    ${nz('Fencing','sFencing','₹',INR)}
+    ${nz('Land Levelling','sLandLevel','₹',INR)}
+    ${nz('Silage Making Unit','sSilageUnit','₹',INR)}
+    ${nz('Computers &amp; CCTV','sComputers','₹',INR)}
+    ${nz('Number of Two-Wheelers','sTwoW','nos')}
+    ${nz('Cost per Two-Wheeler','sTwoWCost','₹',INR)}
+    ${nz('Number of Four-Wheelers','sFourW','nos')}
+    ${nz('Cost per Four-Wheeler','sFourWCost','₹',INR)}
+    ${G('Means of Finance')}
+    ${TE('Margin Money',F2(P('sMargin')),'%')}
+    ${TE('Rate of Interest',F2(P('sInterest')),'% /yr')}
+    ${TE('Repayment Period',NY,'years')}
+    ${TE('Subsidy',F2(P('sSubsidy')),'% of project cost')}
+    ${G('Feeding')}
+    ${TE('Concentrate Feed Required',F2(P('sConcFeed')),'kg/lamb/day')}
+    ${TE('Concentrate Feed Cost',INR(P('sConcCost')),'₹/kg')}
+    ${TE('Dry Fodder Required',F2(P('sDryFodder')),'kg/lamb/day')}
+    ${TE('Dry Fodder Cost',INR(P('sDryCost')),'₹/kg')}
+    ${TE('Silage Required',F2(P('sSilage')),'kg/lamb/day')}
+    ${TE('Silage Cost',INR(P('sSilageCost')),'₹/kg')}
+    ${TE('Green Fodder Area',F2(P('sGreenAcre')),'acre')}
+    ${TE('Green Fodder Cultivation',INR(P('sGreenCost')),'₹/acre')}
+    ${TE('Feed Supplement',INR(P('sFeedSupp')),'₹/lamb')}
+    ${G('Health, Utilities &amp; Depreciation')}
+    ${TE('Veterinary Expenses',INR(P('sVet')),'₹/lamb')}
+    ${TE('Electricity Expenses',INR(P('sElectricity')),'₹/month')}
+    ${nz('Fuel Expenses','sFuel','₹/month',INR)}
+    ${nz('Concentrate Feed Making Expense','sFeedMaking','₹/batch',INR)}
+    ${TE('Miscellaneous Expenses',INR(P('sMisc')),'₹/lamb')}
+    ${TE('Depreciation — Building',F2(P('sDepBuilding')),'% /yr')}
+    ${TE('Depreciation — Equipment',F2(P('sDepEquip')),'% /yr')}
+    ${G('Labour')}
+    ${nz('No. of Labour Required','sWorkers','nos')}
+    ${nz('Wages for Farm Worker','sWage','₹/month',INR)}
+    ${nz('No. of Drivers','sDrivers','nos')}
+    ${nz('Salary for Driver','sDrvSal','₹/month',INR)}
+    ${G('Returns')}
+    ${TE('Sale Price of Ram Lamb',INR(P('sSalePrice')),'₹/lamb')}
+    ${TE('Income from Manure',INR(P('sManure')),'₹/lamb')}
+  </table>`);
+  }
   html+=page(`<div class="sec-title">Investment of the Project</div>
   <table><tr><th>Particulars</th><th class="num">Amount (Rs.)</th></tr>
     <tr class="sec-row"><td>A — Capital / Fixed Investment</td><td></td></tr>
@@ -2031,14 +2314,14 @@ function attachReportActions(s){
     const watermark=_coverImg ? '' : `<div style="position:absolute;left:50%;top:32%;transform:translate(-50%,-50%);font-size:108px;opacity:.13;line-height:1">${emo}</div>`;
     const metric=(l,v)=>`<div style="flex:1;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.20);border-radius:7px;padding:5px 9px"><div style="font-size:8px;letter-spacing:.3px;color:#d2e0d3;text-transform:uppercase;font-weight:700">${l}</div><div style="font-size:15px;font-weight:800;color:#fff;line-height:1.1;margin-top:1px">${v}</div></div>`;
     const p01=`<div class="cp cover" style="background:${coverBg}">${watermark}
-      <div style="position:relative;padding:13px 15px;display:flex;flex-direction:column;height:100%;box-sizing:border-box;text-shadow:0 1px 5px rgba(0,0,0,.6)">
+      <div style="position:relative;padding:13px 15px;display:flex;flex-direction:column;height:100%;text-align:center;box-sizing:border-box;text-shadow:0 1px 5px rgba(0,0,0,.6)">
         <div>
           <div style="font-size:8px;letter-spacing:1.5px;color:#e7d49a">VC&amp;RI NAMAKKAL · BANKABLE PROJECT</div>
           <div style="font-size:23px;font-weight:800;color:${GOLD};font-family:Georgia,serif;line-height:1.02;margin-top:3px">${c.title.toUpperCase()}</div>
           <div style="font-size:8.5px;letter-spacing:1.5px;color:#eaf2ea;margin-top:3px">FINANCIAL VIABILITY REPORT</div>
         </div>
         <div style="margin-top:auto;display:flex;flex-direction:column;gap:6px">
-          <div style="display:inline-block;align-self:flex-start;background:${GOLD};color:#1c1403;font-size:9px;font-weight:800;padding:3px 10px;border-radius:20px">${c.unitText.toUpperCase()} PROJECT</div>
+          <div style="display:inline-block;align-self:center;background:${GOLD};color:#1c1403;font-size:9px;font-weight:800;padding:3px 10px;border-radius:20px">${c.unitText.toUpperCase()}</div>
           <div style="display:flex;gap:6px">${metric('IRR',pct(c.irr))}${metric('BCR',F2(c.bcr))}</div>
           <div style="display:flex;gap:6px">${metric('DSCR (avg)',F2(c.avgDscr))}${metric('NPV',sINR(c.npv))}</div>
           <div style="background:linear-gradient(150deg,${seal.c1},${seal.c2});border:1px solid rgba(255,255,255,.22);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;padding:7px"><span style="font-size:17px">${seal.ic}</span><span style="font-size:12px;font-weight:800;letter-spacing:.4px">${seal.t}</span></div>
