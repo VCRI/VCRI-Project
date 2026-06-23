@@ -179,12 +179,12 @@ textarea.ta{resize:vertical;min-height:62px}
   <main class="app-main" id="appMain">
     <div class="main-inner">
       <div class="intro">
-        <div class="kick">Step 1 of 2 · Your Details</div>
+        <div class="kick">Step 1 of 2 · Beneficiary Details</div>
         <h1>Enter your details to generate the report</h1>
         <p>Fill in each section below. Default values follow the VC&amp;RI model — change any figure to match your own farm, then click <b>Generate Report</b>.</p>
       </div>
       <div class="species-pick">
-        <label for="speciesSel">Type of Animal</label>
+        <label for="speciesSel">Type of Farming</label>
         <select id="speciesSel"></select>
       </div>
       <div class="secmsg" id="footmsg"></div>
@@ -210,7 +210,7 @@ const ICONS = {
 };
 
 const COW_SECTIONS = [
-  { id:'details', title:'Your Details', icon:'details',
+  { id:'details', title:'Beneficiary Details', icon:'details',
     note:'Items 1–9 of the “Project at a Glance” — used on the report cover.',
     fields:[
       {k:'farmerName', label:'Name of the Farmer / Unit', type:'text', req:true, full:true, val:'name', ph:'e.g. Ramesh Kumar Dairy Farm'},
@@ -252,7 +252,7 @@ const COW_SECTIONS = [
   { id:'equip', title:'Equipment', icon:'equip',
     note:'Dairy equipment and machinery. Leave optional items at 0 if not required.',
     fields:[
-      {k:'C24', label:'Feeder &amp; Waterer', type:'num', def:200, unit:'₹/animal', min:0},
+      {k:'C24', label:'Feeder, Waterer &amp; Mat', type:'num', def:200, unit:'₹/animal', min:0},
       {k:'C25', label:'Milking Can', type:'num', def:3000, unit:'₹', min:0},
       {k:'C26', label:'Milking Machine', type:'num', def:60000, unit:'₹', min:0},
       {k:'C27', label:'Chaff Cutter', type:'num', def:30000, unit:'₹', min:0},
@@ -613,7 +613,7 @@ const SHEEP_SECTIONS = [
 
 // ════════ SPECIES REGISTRY — Cow, Goat, Hen & Sheep ════════
 const SPECIES = {
-  Cow:   { label:'Cow / Dairy Farming',          sections: COW_SECTIONS },
+  Cow:   { label:'Dairy Farming - Cow/Buffalo',  sections: COW_SECTIONS },
   Goat:  { label:'Goat Farming',                 sections: GOAT_SECTIONS },
   Hen:   { label:'Native Hen (Broiler)',         sections: HEN_SECTIONS },
   Sheep: { label:'Sheep — Ram Lamb Fattening',   sections: SHEEP_SECTIONS }
@@ -802,7 +802,47 @@ function buildWizard(){
   const aad=document.getElementById('fld_aadhar');
   if(aad){ aad.setAttribute('inputmode','numeric'); aad.setAttribute('maxlength','14');
     aad.addEventListener('input',()=>{ aad.value=aad.value.replace(/[^\d ]/g,'').slice(0,14); }); }
+  // Dynamic breed options based on animal type (Cow vs Buffalo)
+  const c7=document.getElementById('fld_C7'); // Type of Milch Animal
+  const c8=document.getElementById('fld_C8'); // Name of the Breed
+  if(c7&&c8){
+    const updateBreedOptions=()=>{
+      const animalType=c7.value;
+      let breedOpts=[];
+      if(animalType==='Buffalo'){
+        breedOpts=['Murrah graded','Surti','Indigenous'];
+      } else {
+        breedOpts=['Jersey Cross','HF Cross','Indigenous'];
+      }
+      // Rebuild C8 select options
+      c8.innerHTML=breedOpts.map(o=>`<option>${o}</option>`).join('');
+      c8.value=breedOpts[0]; // Set to first option
+    };
+    c7.addEventListener('change',updateBreedOptions);
+    updateBreedOptions(); // Initialize on load
+  }
   cur=0; show(0);
+}
+
+// ── Restore previously entered data (Edit flow) ──
+const SAVED = (function(){ try{ return JSON.parse(sessionStorage.getItem('dairyData')||'null'); } catch(e){ return null; } })();
+if(SAVED && SAVED.species && SPECIES[SAVED.species]){ speciesKey=SAVED.species; SECTIONS=SPECIES[speciesKey].sections; }
+
+// Pre-fill every field on the form with the previously saved values (overrides defaults).
+function populateFromSaved(data){
+  if(!data) return;
+  // set the animal type first so its dependent breed options rebuild before we set the breed
+  const c7=document.getElementById('fld_C7');
+  if(c7 && data.C7!==undefined){ c7.value=data.C7; c7.dispatchEvent(new Event('change')); }
+  for(const s of SECTIONS){
+    for(const f of s.fields){
+      if(f.type==='sub'||f.type==='total') continue;
+      const el=document.getElementById('fld_'+f.k);
+      if(el && data[f.k]!==undefined) el.value=data[f.k];
+      const us=document.getElementById('unit_'+f.k);
+      if(us && data[f.k+'_unit']!==undefined) us.value=data[f.k+'_unit'];
+    }
+  }
 }
 
 // ── Type of Animal selector ──
@@ -814,6 +854,7 @@ if(speciesSel){
 }
 
 buildWizard();
+populateFromSaved(SAVED);
 </script>
 </body>
 </html>

@@ -52,6 +52,8 @@ body{font-family:'Inter',sans-serif;background:#eef3ee;color:var(--text);
 .cover-box .row b{color:var(--text);font-weight:700}
 .cover-foot{font-size:12px;color:var(--muted)}
 .cover-foot b{color:var(--gd)}
+.cover-disclaimer{max-width:520px;margin:26px auto 0;padding-top:12px;border-top:1px solid var(--border);font-size:10.5px;font-weight:600;line-height:1.55;color:var(--muted);text-align:justify}
+.cover-disclaimer b{color:var(--gd)}
 
 /* tables */
 table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:14px}
@@ -249,7 +251,7 @@ body.exporting .hl{margin-bottom:10px}
       <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Edit Details
     </a>
-    <div class="mid"><b>Bankable Dairy Project Report</b></div>
+    <div class="mid"><b>Bankable Livestock and Poultry Farming Report</b></div>
     <div class="nav-actions">
       <button class="nav-btn ghost" id="previewBtn">
         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -585,11 +587,12 @@ const loanAmt   = totalProject - marginAmt;
 const subsidyAmt= totalProject*P('C55')/100;
 
 // ── Repayment schedule (monthly, 3-month moratorium) ──
-const months = NY*12, mRate = P('C53')/100/12, emi = pmt(mRate, months, loanAmt), MORA=3;
+const months = NY*12, mRate = P('C53')/100/12, emi = Math.round(pmt(mRate, months, loanAmt)), MORA=3;
 let bal=loanAmt; const monthly=[];
 for(let m=1;m<=months;m++){
   let intr=bal*mRate, prin, pay;
   if(m<=MORA){ prin=0; pay=intr; }
+  else if(m===months){ prin=bal; pay=bal+intr; bal=0; }   // final month: balloon payment clears the loan to 0 (matches Excel)
   else { prin=emi-intr; pay=emi; bal-=prin; if(bal<-0.01){prin+=bal;pay+=bal;bal=0;} else if(bal<0){bal=0;} }
   monthly.push({m,pay,prin,intr,bal:Math.max(0,bal)});
 }
@@ -673,7 +676,7 @@ const irr = P('C53') + 20*(pvLow/((pvLow+pvHigh)||1));
 const dscrNum = netIncome.map((nr,y)=>nr+yrInt[y]+totalDep[y]);
 const dscrDen = yrPrin.map((p,y)=>p+yrInt[y]);
 const dscr = dscrNum.map((n,y)=> dscrDen[y]? n/dscrDen[y] : 0);
-const avgDscr = dscrNum.reduce((a,b)=>a+b,0)/(dscrDen.reduce((a,b)=>a+b,0)||1);
+const avgDscr = NY ? dscr.reduce((a,b)=>a+b,0)/NY : 0;   // simple average of yearly DSCR (matches corrected Excel)
 
 // ════════════════════ RENDER ════════════════════
 const YH = Array.from({length:NY},(_,y)=>ROMAN[y]+' Year');
@@ -690,7 +693,7 @@ const dDSCRy = y => ZERO ? '—' : F2(dscr[y]);
 
 function pgHeader(){
   return `<div class="pg-header">
-    <div><h2>Veterinary College &amp; Research Institute, Namakkal</h2><p>Dept. of Animal Husbandry Economics — Bankable Dairy Project Report</p></div>
+    <div><h2>Veterinary College &amp; Research Institute, Namakkal</h2><p>Dept. of Animal Husbandry Economics — Bankable Livestock and Poultry Farming Report</p></div>
     <div class="r"><b>${S('farmerName')||'—'}</b>${D.dateStr||''}<br>${S('mobile')?'Ph: '+S('mobile'):''}</div>
   </div>`;
 }
@@ -710,7 +713,7 @@ html += `<div class="rpage"><div class="cover">
   <div class="subtitle">Bankable Project Report &nbsp;·&nbsp; ${NY}-Year Financial Appraisal</div>
   <div class="cover-line"></div>
   <div class="cover-box">
-    <div class="row"><span>Name of the Farmer / Unit</span><b>${S('farmerName')||'—'}</b></div>
+    <div class="row"><span>Name of the Farmer</span><b>${S('farmerName')||'—'}</b></div>
     <div class="row"><span>Type of Animal</span><b>${animalLabel}</b></div>
     <div class="row"><span>Number of Animals</span><b>${NUM(P('C9'))}</b></div>
     <div class="row"><span>Total Project Cost</span><b>${INR(totalProject)}</b></div>
@@ -720,6 +723,7 @@ html += `<div class="rpage"><div class="cover">
     <div class="row"><span>DSCR Value</span><b>${dDSCR}</b></div>
   </div>
   <div class="cover-foot">Prepared using the VC&amp;RI Dairy Project tool &nbsp;·&nbsp; Guided by <b>Dr. V. Senthilkumar</b></div>
+  <div class="cover-disclaimer"><b>Disclaimer:</b> The financial projections and expected return presented herein are based on assumptions and estimates and may be influenced by various external factors beyond the control of the report preparer. Accordingly, the preparatory or guiding authority shall not be held responsible for any loss, business loss, project failure, or default in loan repayment. Further, this report shall not be used as an evidence for any judicial purpose.</div>
 </div></div>`;
 
 // ── PROJECT AT A GLANCE ──
@@ -727,7 +731,7 @@ html += page(`
 <div class="sec-title">Project at a Glance</div>
 <table>
   <tr><th style="width:46%">Particulars</th><th>Details</th></tr>
-  <tr><td>1. Name of the Farmer / Unit</td><td>${S('farmerName')||'—'}</td></tr>
+  <tr><td>1. Name of the Farmer</td><td>${S('farmerName')||'—'}</td></tr>
   <tr><td>2. Address of the Farmer</td><td>${S('farmerAddress')||'—'}</td></tr>
   <tr><td>3. Aadhar Number (optional)</td><td>${S('aadhar')||'—'}</td></tr>
   <tr><td>4. Mobile Number</td><td>${S('mobile')||'—'}</td></tr>
@@ -1241,10 +1245,10 @@ function renderGoat(){
   const totalWC=roundDown2(wc.reduce((a,[,v])=>a+v,0));
   const totalProject=roundDown2(totalCapital+totalWC);
   const margin=totalProject*P('gMargin')/100, loan=totalProject-margin, subsidy=totalProject*P('gSubsidy')/100;
-  // ── Repayment (PMT, 3-month moratorium) ──
-  const months=NY*12, mRate=P('gInterest')/100/12, emi=pmt(mRate,months,loan), MORA=3;
+  // ── Repayment (PMT, 12-month moratorium) ──
+  const months=NY*12, mRate=P('gInterest')/100/12, emi=Math.round(pmt(mRate,months,loan)), MORA=12;
   let bal=loan; const monthly=[];
-  for(let m=1;m<=months;m++){ let intr=bal*mRate,prin,pay; if(m<=MORA){prin=0;pay=intr;} else {prin=emi-intr;pay=emi;bal-=prin; if(bal<-0.01){prin+=bal;pay+=bal;bal=0;} else if(bal<0)bal=0;} monthly.push({m,pay,prin,intr,bal:Math.max(0,bal)}); }
+  for(let m=1;m<=months;m++){ let intr=bal*mRate,prin,pay; if(m<=MORA){prin=0;pay=intr;} else if(m===months){prin=bal;pay=bal+intr;bal=0;} else {prin=emi-intr;pay=emi;bal-=prin; if(bal<-0.01){prin+=bal;pay+=bal;bal=0;} else if(bal<0)bal=0;} monthly.push({m,pay,prin,intr,bal:Math.max(0,bal)}); }
   const yrInt=[],yrPrin=[]; for(let y=0;y<NY;y++){let si=0,sp=0;for(let mo=y*12;mo<(y+1)*12;mo++){si+=monthly[mo].intr;sp+=monthly[mo].prin;}yrInt.push(si);yrPrin.push(sp);}
   // ── Depreciation ──
   const bldgBase=adultShed+kidPen+storeRoom+labourQ;
@@ -1275,7 +1279,7 @@ function renderGoat(){
   const dscrNum=netIncome.map((n,y)=>n+yrInt[y]+totalDep[y]);
   const dscrDen=yrPrin.map((p,y)=>p+yrInt[y]);
   const dscr=dscrNum.map((n,y)=>dscrDen[y]?n/dscrDen[y]:0);
-  const avgDscr=dscrNum.reduce((a,b)=>a+b,0)/(dscrDen.reduce((a,b)=>a+b,0)||1);
+  const avgDscr=NY?dscr.reduce((a,b)=>a+b,0)/NY:0;   // simple average of yearly DSCR (matches corrected Excel)
   const ZERO=tot<=0;
   const dNPV=ZERO?'—':INR(npv), dBCR=ZERO?'—':F2(bcr), dIRR=ZERO?'—':F2(irr)+'%', dDSCR=ZERO?'—':F2(avgDscr);
 
@@ -1307,6 +1311,7 @@ function renderGoat(){
       <div class="row"><span>DSCR Value</span><b>${dDSCR}</b></div>
     </div>
     <div class="cover-foot">Prepared using the VC&amp;RI Livestock Project tool &nbsp;·&nbsp; Guided by <b>Dr. V. Senthilkumar</b></div>
+    <div class="cover-disclaimer"><b>Disclaimer:</b> The financial projections and expected return presented herein are based on assumptions and estimates and may be influenced by various external factors beyond the control of the report preparer. Accordingly, the preparatory or guiding authority shall not be held responsible for any loss, business loss, project failure, or default in loan repayment. Further, this report shall not be used as an evidence for any judicial purpose.</div>
   </div></div>`;
   // glance
   html+=page(`<div class="sec-title">Project at a Glance</div>
@@ -1608,7 +1613,7 @@ function renderHen(){
   const dscrNum=totalIncome.map((ti,y)=>ti-operating[y]);
   const dscrDen=yrPrin.map((p,y)=>p+yrInt[y]);
   const dscr=dscrNum.map((n,y)=>dscrDen[y]?n/dscrDen[y]:0);
-  const avgDscr=dscrNum.reduce((a,b)=>a+b,0)/(dscrDen.reduce((a,b)=>a+b,0)||1);
+  const avgDscr=NY?dscr.reduce((a,b)=>a+b,0)/NY:0;   // simple average of yearly DSCR (matches corrected Excel)
   const ZERO=birds<=0;
   const dNPV=ZERO?'—':INR(npv), dBCR=ZERO?'—':F2(bcr), dIRR=ZERO?'—':F2(irr)+'%', dDSCR=ZERO?'—':F2(avgDscr);
 
@@ -1638,6 +1643,7 @@ function renderHen(){
       <div class="row"><span>DSCR Value</span><b>${dDSCR}</b></div>
     </div>
     <div class="cover-foot">Prepared using the VC&amp;RI Livestock Project tool &nbsp;·&nbsp; Guided by <b>Dr. V. Senthilkumar</b></div>
+    <div class="cover-disclaimer"><b>Disclaimer:</b> The financial projections and expected return presented herein are based on assumptions and estimates and may be influenced by various external factors beyond the control of the report preparer. Accordingly, the preparatory or guiding authority shall not be held responsible for any loss, business loss, project failure, or default in loan repayment. Further, this report shall not be used as an evidence for any judicial purpose.</div>
   </div></div>`;
   html+=page(`<div class="sec-title">Project at a Glance</div>
   <table><tr><th style="width:46%">Particulars</th><th>Details</th></tr>
@@ -1956,6 +1962,7 @@ function renderSheep(){
       <div class="row"><span>DSCR Value</span><b>${dDSCR}</b></div>
     </div>
     <div class="cover-foot">Prepared using the VC&amp;RI Livestock Project tool &nbsp;·&nbsp; Guided by <b>Dr. V. Senthilkumar</b></div>
+    <div class="cover-disclaimer"><b>Disclaimer:</b> The financial projections and expected return presented herein are based on assumptions and estimates and may be influenced by various external factors beyond the control of the report preparer. Accordingly, the preparatory or guiding authority shall not be held responsible for any loss, business loss, project failure, or default in loan repayment. Further, this report shall not be used as an evidence for any judicial purpose.</div>
   </div></div>`;
   html+=page(`<div class="sec-title">Project at a Glance</div>
   <table><tr><th style="width:46%">Particulars</th><th>Details</th></tr>
