@@ -9,7 +9,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--gd:#14532d;--gm:#1B5E20;--gl:#2E7D32;--gp:#E8F5E9;--gold:#F9A825;--ink:#10241a;--muted:#5b6f63;--line:#cfe3d2;--cream:#f6faf4}
 a{text-decoration:none;color:inherit}
-html{scroll-behavior:smooth;scroll-padding-top:70px}
+html{scroll-behavior:smooth;scroll-padding-top:70px;background:var(--gd);overscroll-behavior:none}
 body{font-family:'Inter',sans-serif;color:var(--ink);background:var(--cream);line-height:1.55;margin:0}
 
 /* HEADER — normal element inside hero, scrolls naturally with it */
@@ -30,7 +30,7 @@ body{font-family:'Inter',sans-serif;color:var(--ink);background:var(--cream);lin
 /* HERO (cow image · text left · professor card bottom-right) */
 .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;color:#fff;overflow:hidden;
   background:linear-gradient(100deg,rgba(7,28,15,.9) 0%,rgba(7,28,15,.6) 42%,rgba(7,28,15,.22) 72%,rgba(7,28,15,.05) 100%),
-             url('Hero section Image.png');
+             url('Hero section Image.png') #0a2a16;
   background-size:cover;background-position:center right;background-repeat:no-repeat}
 .hero-content{display:flex;align-items:center;flex:1;padding:46px 6vw;position:relative;z-index:2}
 .hero-left{position:relative;z-index:2;max-width:620px}
